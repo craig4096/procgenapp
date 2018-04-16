@@ -1,0 +1,15 @@
+
+start_point { start_point 0 0 0 0 | segment1 0 0 -17 0 } const 1.0
+
+segment1 { segment1 0 0 0 0 | segment1 0 0 -4 0 } const 10.0
+segment1 { segment1 0 0 0 0 | segment1 0 0 4 0 } const 10.0
+
+segment1 { segment1 0 0 0 0 | junction1 0 0 -5 0 } const 1.0
+segment1 { segment1 0 0 0 0 | junction1 0 0 5 0 } const 1.0
+
+junction1 { junction1 0 0 0 0 | segment1 0 0 -5 0 } const 10.0
+junction1 { junction1 0 0 0 0 | segment1 5 0 0 90 } const 10.0
+junction1 { junction1 0 0 0 0 | segment1 -5 0 0 90 } const 10.0
+
+
+

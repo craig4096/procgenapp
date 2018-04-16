@@ -1,0 +1,2 @@
+
+floor_seg_2 { floor_seg_term 0 0 0 0 | floor_seg_term 0 6 0 0 } const 1.0
