@@ -1,0 +1,7 @@
+
+segment1 { segment1 0 0 0 0 | wall1 0 2.5 2.5 0 | floor_seg 0 -0.5 7 0 } const 0.2
+segment1 { segment1 0 0 0 0 | wall1 0 2.5 -2.5 180 | floor_seg 0 -0.5 -7 0 } const 0.2
+
+
+
+

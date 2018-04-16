@@ -1,0 +1,51 @@
+
+junction1 { junction1 0 0 0 0 | segment1 0 0 -5 0 } const 10.0
+junction1 { junction1 0 0 0 0 | segment1 5 0 0 90 } const 10.0
+junction1 { junction1 0 0 0 0 | segment1 -5 0 0 90 } const 10.0
+
+segment1 { segment1 0 0 0 0 | segment1 0 0 -4 0 } const 10.0
+segment1 { segment1 0 0 0 0 | segment1 0 0 4 0 } const 10.0
+
+segment1 { segment1 0 0 0 0 | junction1 0 0 -5 0 } const 0.8
+segment1 { segment1 0 0 0 0 | junction1 0 0 5 0 } const 0.8
+
+path_seg { path_seg 0 0 0 0 | path_seg 0 0 -2.01 0 } const 1.0
+path_seg { path_seg 0 0 0 0 | path_seg 0 0 2.01 0 } const 1.0
+
+path_seg { path_seg 0 0 0 0 | path_corn 0 0 2.01 0 } const 0.05
+path_seg { path_seg 0 0 0 0 | path_corn 0 0 -2.01 90 } const 0.05
+
+path_seg { path_seg_plain 0 0 0 0 | path_junc 0 0 2.01 0 } const 0.05
+path_seg { path_seg_plain 0 0 0 0 | path_junc 0 0 -2.01 0 } const 0.05
+
+path_seg { path_seg 0 0 0 0 | building_part 0 0 5.01 0 } const 0.05
+building_part { building_part 0 0 0 0 | building_part 0 6.01 0 0 } const 1
+building_part { building_part 0 0 0 0 | building_top 0 6.01 0 0 } const 1
+
+path_seg { bridge_path 0 0 0 0 | path_seg 0 0 2.01 0 | bridge -3.72 0.5 0 -90 | tower_part -8 1 0 0 | tower_part -8 5 0 0 } radial 0 0 0 50 0 1
+path_seg { bridge_path 0 0 0 0 | path_seg 0 0 -2.01 0 | bridge -3.72 0.5 0 -90 | tower_part -8 1 0 0 | tower_part -8 5 0 0 } radial 0 0 0 50 0 1
+
+tower_part { tower_part 0 0 0 0 | tower_part 0 4.01 0 0 } const 0.3
+tower_part { tower_part 0 0 0 0 | tower_roof 0 5.01 0 0 } const 0.3
+
+tower_part { tower_part 0 0.01 0 0 | tower_part 0 4.02 0 0 } const 0.3
+tower_part { tower_balcony 0 1.01 0 0 | tower_part 0 4.02 0 0 } const 0.3
+tower_part { tower_balcony 0 1.01 0 45 | tower_part 0 4.02 0 0 } const 0.3
+tower_part { tower_balcony 0 1.01 0 180 | tower_part 0 4.02 0 0 } const 0.3
+tower_part { tower_balcony 0 1.01 0 225 | tower_part 0 4.02 0 0 } const 0.3
+
+path_corn { path_corn 0 0 0 0 | path_seg2 -2.01 0 0 90 } const 1.0
+path_corn { path_corn 0 0 0 0 | path_seg2 0 0 -2.01 0 } const 1.0
+
+path_seg2 { path_seg2 0 0 0 0 | path_seg 0 0 -2.01 0 } const 1.0
+path_seg2 { path_seg2 0 0 0 0 | path_seg 0 0 2.01 0 } const 1.0
+
+path_junc { path_junc 0 0 0 0 | path_seg_plain 0 0 2.01 0 } const 1.0
+path_junc { path_junc 0 0 0 0 | path_seg_plain 0 0 -2.01 0 } const 1.0
+path_junc { path_junc 0 0 0 0 | path_seg_plain 2.01 0 0 90 } const 1.0
+path_junc { path_junc 0 0 0 0 | path_seg_plain -2.01 0 0 90 } const 1.0
+
+path_seg_plain { path_seg_plain 0 0 0 0 | path_seg 0 0 2.01 0 } const 1.0
+path_seg_plain { path_seg_plain 0 0 0 0 | path_seg 0 0 -2.01 0 } const 1.0
+
+

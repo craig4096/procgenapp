@@ -1,0 +1,10 @@
+
+junction1	meshes/dungeon/junction1.txt
+segment1	meshes/dungeon/segment1.txt
+start_point	meshes/dungeon/start_point.txt
+wall1		meshes/dungeon/wall1.txt
+wall2		meshes/dungeon/wall2.txt
+floor_seg	meshes/dungeon/floor_seg.txt
+floor_seg_2	meshes/dungeon/floor_seg.txt
+marker		meshes/dungeon/marker.txt
+corner		meshes/dungeon/corner.txt

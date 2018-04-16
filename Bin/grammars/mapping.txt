@@ -1,0 +1,15 @@
+
+path_seg	meshes/path_seg.txt
+path_corn	meshes/path_corn.txt
+path_seg2	meshes/path_seg2.txt
+bridge		meshes/bridge.txt
+bridge_path	meshes/bridge_path.txt
+tower_part	meshes/tower_sec.txt
+tower_roof	meshes/tower_roof.txt
+tower_balcony	meshes/balcony.txt
+path_junc	meshes/junction.txt
+path_seg_plain	meshes/path_seg_plain.txt
+building_part	meshes/building_part.txt
+building_top	meshes/building_top.txt
+junction1	meshes/junction1.txt
+segment1	meshes/segment1.txt

@@ -1,0 +1,6 @@
+
+castle_entrance		meshes/castle/floor_block.txt
+floor_block		meshes/castle/floor_block.txt
+floor_window1			meshes/castle/window1.txt
+floor_window2			meshes/castle/window2.txt
+floor_window3			meshes/castle/window3.txt

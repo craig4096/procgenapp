@@ -1,0 +1,7 @@
+water		shaders/water.glslf
+clouds		shaders/clouds.glslf
+terrain		shaders/terrain.glslf
+noise		shaders/noise.glslf
+brick		shaders/brick.glslf
+dirt		shaders/dirt.glslf
+wood		shaders/wood.glslf
