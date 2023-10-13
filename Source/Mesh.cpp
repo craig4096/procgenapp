@@ -11,41 +11,41 @@ void SubMesh::Load(std::ifstream& ifs) {
     cout << "mesh material name: " << materialName << endl;
     //this->texture = 0;//ImageManager::LoadTexture(texFile.c_str());
 
-	int nVerts;
-	ifs >> nVerts;
+    int nVerts;
+    ifs >> nVerts;
 
-	std::vector<float> verts(nVerts*3);
-	std::vector<float> norms(nVerts*3);
-	std::vector<float> uvs(nVerts*2);
+    std::vector<float> verts(nVerts*3);
+    std::vector<float> norms(nVerts*3);
+    std::vector<float> uvs(nVerts*2);
 
-	for(int i = 0; i < verts.size(); ++i) {
-		ifs >> verts[i];
-	}
-	for(int i = 0; i < norms.size(); ++i) {
-		ifs >> norms[i];
-	}
-	for(int i = 0; i < uvs.size(); ++i) {
-		ifs >> uvs[i];
+    for(int i = 0; i < verts.size(); ++i) {
+        ifs >> verts[i];
+    }
+    for(int i = 0; i < norms.size(); ++i) {
+        ifs >> norms[i];
+    }
+    for(int i = 0; i < uvs.size(); ++i) {
+        ifs >> uvs[i];
 if((i % 2) == 0) {
-	uvs[i] = 1.0f-uvs[i];
+    uvs[i] = 1.0f-uvs[i];
 }
-	}
+    }
 
-	// calculate object bounding box
-	// assert(verts.size()>2)
-	bounds.min = bounds.max = vec3(verts[0], verts[1], verts[2]);
-	for(int i = 0; i < verts.size(); i += 3) {
-		bounds.addPoint(vec3(verts[i+0], verts[i+1], verts[i+2]));
-	}
+    // calculate object bounding box
+    // assert(verts.size()>2)
+    bounds.min = bounds.max = vec3(verts[0], verts[1], verts[2]);
+    for(int i = 0; i < verts.size(); i += 3) {
+        bounds.addPoint(vec3(verts[i+0], verts[i+1], verts[i+2]));
+    }
 
-	int numTris;
-	ifs >> numTris;
-	indexCount = numTris * 3;
-	std::vector<unsigned int> inds(indexCount);
+    int numTris;
+    ifs >> numTris;
+    indexCount = numTris * 3;
+    std::vector<unsigned int> inds(indexCount);
 
-	for(int i = 0; i < indexCount; ++i) {
-		ifs >> inds[i];
-	}
+    for(int i = 0; i < indexCount; ++i) {
+        ifs >> inds[i];
+    }
     cout << "creating buffers" << endl;
     // create the buffer objects
     glGenBuffers(1, &this->vertices);
@@ -67,10 +67,10 @@ if((i % 2) == 0) {
 }
 
 void SubMesh::Unload() {
-	glDeleteBuffers(1, &vertices);
-	glDeleteBuffers(1, &indices);
-	glDeleteBuffers(1, &normals);
-	glDeleteBuffers(1, &texcoords);
+    glDeleteBuffers(1, &vertices);
+    glDeleteBuffers(1, &indices);
+    glDeleteBuffers(1, &normals);
+    glDeleteBuffers(1, &texcoords);
 }
 
 void SubMesh::Draw() {    
@@ -110,37 +110,37 @@ void SubMesh::DrawNoTextures() {
 
 
 Mesh::Mesh(const string& filename) {
-	ifstream ifs(filename.c_str());
-	if(!ifs.good()) {
+    ifstream ifs(filename.c_str());
+    if(!ifs.good()) {
         std::stringstream ss;
         ss << "could not open mesh file: " << filename << endl;
         throw std::logic_error(ss.str());
-	}
-	int numSubMeshes;
-	ifs >> numSubMeshes;
-	meshes.resize(numSubMeshes);
-	// load all submeshes
-	for(int i = 0; i < numSubMeshes; ++i) {
+    }
+    int numSubMeshes;
+    ifs >> numSubMeshes;
+    meshes.resize(numSubMeshes);
+    // load all submeshes
+    for(int i = 0; i < numSubMeshes; ++i) {
         meshes[i].Load(ifs);
-		if(i == 0) {
-			bounds = meshes[0].getBounds();
-		} else {
-			bounds.addBounds(meshes[i].getBounds());
-		}
-	}
+        if(i == 0) {
+            bounds = meshes[0].getBounds();
+        } else {
+            bounds.addBounds(meshes[i].getBounds());
+        }
+    }
 }
 
 Mesh::~Mesh() {
-	for(int i = 0; i < meshes.size(); ++i) {
-		meshes[i].Unload();
-	}
+    for(int i = 0; i < meshes.size(); ++i) {
+        meshes[i].Unload();
+    }
 }
 
 
 void Mesh::Draw() {
-	for(int i = 0; i < meshes.size(); ++i) {
-		meshes[i].Draw();
-	}
+    for(int i = 0; i < meshes.size(); ++i) {
+        meshes[i].Draw();
+    }
 }
 
 void Mesh::DrawNoTextures() {

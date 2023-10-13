@@ -2,8 +2,8 @@
 #include "ui_application.h"
 #include <iostream>
 #include <QTime>
-#include <QDesktopWidget>
-#include <QGLFormat>
+#include <QGuiApplication>
+#include <QScreen>
 using namespace std;
 
 Application::Application(QWidget *parent) :
@@ -14,8 +14,8 @@ Application::Application(QWidget *parent) :
     ui->setupUi(this);
 
     // centre and size the window
-    QDesktopWidget* dw = QApplication::desktop();
-    QRect r = dw->screenGeometry();
+    QScreen* screen = QGuiApplication::primaryScreen();
+    QRect r = screen->availableGeometry();
     int width = (0.7f * r.width());
     int height = (0.6f * r.height());
 

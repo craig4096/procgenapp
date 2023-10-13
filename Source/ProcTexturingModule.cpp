@@ -12,8 +12,9 @@ ProcTexturingModule::ProcTexturingModule(Ui::Application* ui, QObject *parent)
   : QObject(parent)
   , ui(ui)
   , shaderInvalid(true)
-  , shader(NULL)
+  , shader(nullptr)
   , time(0.0f)
+  , mesh(nullptr)
 {
     viewport = new Viewport3D("skybox", 0.01f, 5, 0.005f);
 
@@ -86,7 +87,7 @@ void ProcTexturingModule::saveAndCompile() {
     }
     // invalidate the shader
     shaderInvalid = true;
-    viewport->updateGL();
+    viewport->update();
 }
 
 void ProcTexturingModule::loadShader() {

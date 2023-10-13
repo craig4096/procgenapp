@@ -1,7 +1,7 @@
 #include "InverseThermalErosion.h"
 #include <fstream>
 #include "defs.h"
-#include <QTime>
+#include <QElapsedTimer>
 #include <iostream>
 using namespace std;
 
@@ -27,7 +27,7 @@ void InverseThermalErosion::operate(HeightmapStack* stack, Progress* progress) {
     stats << "# ErosionScore\t\tWalkableArea\t\tDisconnected Regions" << endl;
 #endif
 
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
     for(int j = 0; j < numIterations; ++j) {
 #ifdef INVTHERMAL_OUTPUT_STATS

@@ -2,11 +2,11 @@
 #define VIEWPORT3D_H
 
 #include "GL/glew.h"
-#include <QtOpenGL/QGLWidget>
+#include <QOpenGLWidget>
 #include "math3d.h"
 #include "Skybox.h"
 
-class Viewport3D : public QGLWidget {
+class Viewport3D : public QOpenGLWidget {
     Q_OBJECT
 public:
     class Renderer {
@@ -39,14 +39,14 @@ public:
 
     const matrix4& getViewMatrix() const { return viewMatrix; }
 
-    void initializeGL();
-    void resizeGL(int width, int height);
-    void paintGL();
+    void initializeGL() override;
+    void resizeGL(int width, int height) override;
+    void paintGL() override;
     void setRenderer(Renderer*);
-    void mousePressEvent(QMouseEvent*);
-    void mouseReleaseEvent(QMouseEvent*);
-    void mouseMoveEvent(QMouseEvent*);
-    void wheelEvent(QWheelEvent*);
+    void mousePressEvent(QMouseEvent*) override;
+    void mouseReleaseEvent(QMouseEvent*) override;
+    void mouseMoveEvent(QMouseEvent*) override;
+    void wheelEvent(QWheelEvent*) override;
 };
 
 #endif // VIEWPORT3D_H

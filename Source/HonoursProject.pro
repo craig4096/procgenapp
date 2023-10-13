@@ -4,15 +4,12 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
-
-unix:LIBS += -lGLEW
+QT       += core gui opengl widgets openglwidgets
 
 TARGET = ../Bin/HonoursProject
 TEMPLATE = app
 
 OBJECTS_DIR = ../Obj
-
 
 SOURCES += main.cpp\
     Heightmap.cpp \
@@ -93,3 +90,13 @@ HEADERS  += \
 
 FORMS    += application.ui \
     application.ui
+	
+LIBS += -LC:/vcpkg/installed/x64-windows/lib
+
+INCLUDEPATH += C:/vcpkg/installed/x64-windows/include
+
+LIBS += -lopengl32
+LIBS += -lglew32
+LIBS += -lGLU32
+
+

@@ -3,14 +3,14 @@
 
 #include "GL/glew.h"
 #include <QObject>
-#include <QtOpenGL/QGLWidget>
+#include <QOpenGLWidget>
 #include "Game/GameDemo.h"
 
 namespace Ui {
     class Application;
 }
 
-class GameModule : public QGLWidget
+class GameModule : public QOpenGLWidget
 {
     Q_OBJECT
     GameDemo* game;

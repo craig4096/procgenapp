@@ -1,6 +1,6 @@
 #include "ThermalErosion.h"
 #include <fstream>
-#include <QTime>
+#include <QElapsedTimer>
 #include <iostream>
 #include "defs.h"
 using namespace std;
@@ -26,7 +26,7 @@ void ThermalErosion::operate(HeightmapStack* stack, Progress* progress) {
     stats.precision(6);
     stats << "#ErosionScore\t\tWalkableArea\t\tDisconnectedRegions" << endl;
 #endif
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
     for(int j = 0; j < numIterations; ++j) {
 #ifdef THERMAL_OUTPUT_STATS

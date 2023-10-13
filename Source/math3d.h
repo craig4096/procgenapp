@@ -9,84 +9,84 @@
 #define RAD_TO_DEG (180.0f/M_PI)
 
 struct vec2 {
-	float x, y;
+    float x, y;
 
-	vec2();
-	vec2(float x, float y);
+    vec2();
+    vec2(float x, float y);
 
-	void normalize();
+    void normalize();
 
-	vec2 operator-(const vec2& other) const;
+    vec2 operator-(const vec2& other) const;
 
-	float dotProduct(const vec2& other) const;
+    float dotProduct(const vec2& other) const;
 
-	void print();
+    void print();
 };
 
 struct vec3 {
-	float x, y, z;
+    float x, y, z;
 
-	vec3();
-	vec3(float x, float y, float z);
-	vec3(float v[3]);
+    vec3();
+    vec3(float x, float y, float z);
+    vec3(float v[3]);
 
-	vec3 operator +(const vec3& other) const;
-	vec3 operator -(const vec3& other) const;
-	vec3 operator *(float scalar) const;
-	vec3 operator /(float scalar) const;
+    vec3 operator +(const vec3& other) const;
+    vec3 operator -(const vec3& other) const;
+    vec3 operator *(float scalar) const;
+    vec3 operator /(float scalar) const;
 
-	vec3& operator +=(const vec3& other);
-	vec3& operator -=(const vec3& other);
+    vec3& operator +=(const vec3& other);
+    vec3& operator -=(const vec3& other);
 
-	vec3& operator *=(float scalar);
-	vec3& operator /=(float scalar);
+    vec3& operator *=(float scalar);
+    vec3& operator /=(float scalar);
 
 
     // calculates the angle (in radians) between two vectors
     float calcAngle(const vec3& other);
-	float dotProduct(const vec3& other);
-	vec3 crossProduct(const vec3& other);
-	float length() const;
-	void normalize();
-	vec3 normalized() const;
+    float dotProduct(const vec3& other);
+    vec3 crossProduct(const vec3& other);
+    float length() const;
+    void normalize();
+    vec3 normalized() const;
 };
 
 std::ostream& operator <<(std::ostream& cout, const vec3&);
 
 struct Line3d {
-	vec3 a, b;
+    vec3 a, b;
 };
 
 struct matrix4 {
-	float e[16];
+    float e[16];
 };
 
 struct Plane3d {
-	vec3	normal;
-	float	distance;
+    vec3	normal;
+    float	distance;
 };
 
 struct Sphere {
-	vec3	center;
-	float	radius;
+    vec3	center;
+    float	radius;
 };
 
 struct Triangle {
-	vec3 a, b, c;
+    vec3 a, b, c;
 };
 
 struct BoundingBox {
-	vec3 min, max;
+    vec3 min, max;
 
-	bool intersects(const BoundingBox& bb) const;
+    bool intersects(const BoundingBox& bb) const;
 
-	void addPoint(const vec3& point);
-	void addBounds(const BoundingBox& bounds);
-	bool pointInside(const vec3& point) const;
-	BoundingBox translate(const vec3&) const;
+    void addPoint(const vec3& point);
+    void addBounds(const BoundingBox& bounds);
+    bool pointInside(const vec3& point) const;
+    BoundingBox translate(const vec3&) const;
 
-	// gets the 8 corner points of the bounding box
-	void getCorners(vec3[8]) const;
+    // gets the 8 corner points of the bounding box
+    void getCorners(vec3[8]) const;
 
     bool inside(const BoundingBox& other) const;
 };

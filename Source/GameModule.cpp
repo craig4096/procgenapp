@@ -4,7 +4,7 @@
 #include <QKeyEvent>
 
 GameModule::GameModule(Ui::Application* ui, QWidget *parent)
-    : QGLWidget(parent)
+    : QOpenGLWidget(parent)
 {
 
     game = new GameDemo();
@@ -26,7 +26,7 @@ void GameModule::initializeGL() {
 
     // create a timer to regulate the drawing of the widget
     QTimer* timer = new QTimer();
-    connect(timer, SIGNAL(timeout()), this, SLOT(updateGL()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(33);
 }
 

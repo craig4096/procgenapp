@@ -19,19 +19,19 @@ public:
         RandSelOne
     };
 
-	struct Rule {
+    struct Rule {
         RHSFilterType filterType;
-		std::string lhsSymbol;
-		struct RHS {
+        std::string lhsSymbol;
+        struct RHS {
             bool isClass;   // determines whether the symbol member represents an actual shape or a class
-			std::string symbol;
-			vec3 translation;
-			float yRotation;
-		};
-		std::vector<RHS> rhs;
+            std::string symbol;
+            vec3 translation;
+            float yRotation;
+        };
+        std::vector<RHS> rhs;
         //float probability;
         ProbabilityFunction* probFunc;
-	};
+    };
 
 private:
 
@@ -42,7 +42,7 @@ private:
     // rules defining this shape grammar
     std::vector<Rule> rules;
 
-	// applies a rule to a shape and returns a new set of shapes
+    // applies a rule to a shape and returns a new set of shapes
     std::vector<Shape> applyRule(const Shape& shape, const Rule& rule, const SymbolMeshMap& symbolMeshMap);
 
     // determines whether the rule can be applied to the specific shape or not
@@ -50,18 +50,18 @@ private:
                     const Rule& rule);
 
 
-	// given an array of rules this function will randomly select a rule based on its
+    // given an array of rules this function will randomly select a rule based on its
     // probability distribution (function)
     static int selectRule(const Shape& shape, const std::vector<Rule>& candidateRules);
 
 public:
 
 
-	BasicShapeGrammar(const std::string& rulesFile);
-	~BasicShapeGrammar();
+    BasicShapeGrammar(const std::string& rulesFile);
+    ~BasicShapeGrammar();
 
-	// generates a set of shapes using this grammar. This function uses the symbol mesh map
-	// only to perform an overlap test between the boundaries of the meshes. It assumes that this
-	// SymbolMeshMap will also be used in rendering the final result
+    // generates a set of shapes using this grammar. This function uses the symbol mesh map
+    // only to perform an overlap test between the boundaries of the meshes. It assumes that this
+    // SymbolMeshMap will also be used in rendering the final result
     void generate(ShapeDatabase& shapes, int numIterations);
 };

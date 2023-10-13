@@ -15,111 +15,111 @@ Heightmap::Heightmap(int width, int height)
 }
 
 Heightmap::Heightmap(int width, int height, float scaleX, float scaleY, float scaleZ)
-	: Array2D<float>(width, height)
+    : Array2D<float>(width, height)
 {
-	this->scaleX = scaleX;
-	this->scaleY = scaleY;
-	this->scaleZ = scaleZ;
+    this->scaleX = scaleX;
+    this->scaleY = scaleY;
+    this->scaleZ = scaleZ;
 
-	ClearAll(0.0f);
+    ClearAll(0.0f);
 }
 
 Heightmap::~Heightmap() {
 }
 
 float Heightmap::GetScaledHeight(int x, int y) const {
-	return GetValue(x, y) * scaleY;
+    return GetValue(x, y) * scaleY;
 }
 
 float Heightmap::CalculateMeanSlope() const {
-	float mean = 0.0f;
-	for(int x = 0; x < GetWidth(); ++x) {
-		for(int y = 0; y < GetHeight(); ++y) {
-			float h = GetValue(x, y);
-			int nindices[4][2] = {
-				{ x-1, y },
-				{ x+1, y },
-				{ x, y-1 },
-				{ x, y+1 }
-			};
+    float mean = 0.0f;
+    for(int x = 0; x < GetWidth(); ++x) {
+        for(int y = 0; y < GetHeight(); ++y) {
+            float h = GetValue(x, y);
+            int nindices[4][2] = {
+                { x-1, y },
+                { x+1, y },
+                { x, y-1 },
+                { x, y+1 }
+            };
 
-			float maxSlope = -1000000.0f;
-			for(int i = 0; i < 4; ++i) {
-				if(IndexValid(nindices[i][0], nindices[i][1])) {
-					float slope = h - GetValue(nindices[i][0], nindices[i][1]);
-					if(slope > maxSlope) {
-						maxSlope = slope;
-					}
-				}
-			}
-			mean += maxSlope;
-		}
-	}
-	return mean / (float)(GetWidth()*GetHeight());
+            float maxSlope = -1000000.0f;
+            for(int i = 0; i < 4; ++i) {
+                if(IndexValid(nindices[i][0], nindices[i][1])) {
+                    float slope = h - GetValue(nindices[i][0], nindices[i][1]);
+                    if(slope > maxSlope) {
+                        maxSlope = slope;
+                    }
+                }
+            }
+            mean += maxSlope;
+        }
+    }
+    return mean / (float)(GetWidth()*GetHeight());
 }
 
 float sqrd(float a) { return a*a; }
 
 float Heightmap::CalculateSlopeStandardDeviation(float average) const {
-	float sd = 0.0f;
-	for(int x = 0; x < GetWidth(); ++x) {
-		for(int y = 0; y < GetHeight(); ++y) {
-			float h = GetValue(x, y);
-			int nindices[4][2] = {
-				{ x-1, y },
-				{ x+1, y },
-				{ x, y-1 },
-				{ x, y+1 }
-			};
+    float sd = 0.0f;
+    for(int x = 0; x < GetWidth(); ++x) {
+        for(int y = 0; y < GetHeight(); ++y) {
+            float h = GetValue(x, y);
+            int nindices[4][2] = {
+                { x-1, y },
+                { x+1, y },
+                { x, y-1 },
+                { x, y+1 }
+            };
 
-			float maxSlope = -1000000.0f;
-			for(int i = 0; i < 4; ++i) {
-				if(IndexValid(nindices[i][0], nindices[i][1])) {
-					float slope = h - GetValue(nindices[i][0], nindices[i][1]);
-					if(slope > maxSlope) {
-						maxSlope = slope;
-					}
-				}
-			}
-			sd += sqrd(maxSlope - average);
-		}
-	}
-	return sqrt(sd / (float)(GetWidth()*GetHeight()));
+            float maxSlope = -1000000.0f;
+            for(int i = 0; i < 4; ++i) {
+                if(IndexValid(nindices[i][0], nindices[i][1])) {
+                    float slope = h - GetValue(nindices[i][0], nindices[i][1]);
+                    if(slope > maxSlope) {
+                        maxSlope = slope;
+                    }
+                }
+            }
+            sd += sqrd(maxSlope - average);
+        }
+    }
+    return sqrt(sd / (float)(GetWidth()*GetHeight()));
 }
 
 
 float Heightmap::CalculateErosionScore() const {
-	float mean = CalculateMeanSlope();
-	return CalculateSlopeStandardDeviation(mean) / mean;
+    float mean = CalculateMeanSlope();
+    return CalculateSlopeStandardDeviation(mean) / mean;
 }
 
 
 float Heightmap::GetWorldHeight(float xr, float zr) const
 {
-	// convert coordinates into normal space (i.e without scale factors)
-	float xx = (xr / scaleX) + (GetWidth()*0.5f);
-	float zz = (zr / scaleZ) + (GetHeight()*0.5f);
+    // convert coordinates into normal space (i.e without scale factors)
+    float xx = (xr / scaleX) + (GetWidth()*0.5f);
+    float zz = (zr / scaleZ) + (GetHeight()*0.5f);
 
-	// get the location of these coordinates in the heightmap
+    // get the location of these coordinates in the heightmap
     int x = (int)floor(xx);
     int z = (int)floor(zz);
 
-	// check for out of bounds
-	if(x < 0 || z < 0 || x > GetWidth()-2 || z > GetHeight()-2) {
-		return 0.0f;
-	}
+    // check for out of bounds
+    if(x < 0 || z < 0 || x > GetWidth()-2 || z > GetHeight()-2) {
+        return 0.0f;
+    }
 
-	// get the four heights
-	float a = GetValue(x, z);
-	float b = GetValue(x+1, z);
-	float c = GetValue(x+1, z+1);
-	float d = GetValue(x, z+1);
+    // get the four heights
+    float a = GetValue(x, z);
+    float b = GetValue(x+1, z);
+    float c = GetValue(x+1, z+1);
+    float d = GetValue(x, z+1);
 
-	// use bilinear filtering to calculate the height inbetween these values
-	float xratio = (xx - (float)x);
-	float ab = a + ((b - a) * xratio);
-	float dc = d + ((c - d) * xratio);
-	float zratio = (zz - (float)z);
+    // use bilinear filtering to calculate the height inbetween these values
+    float xratio = (xx - (float)x);
+    float ab = a + ((b - a) * xratio);
+    float dc = d + ((c - d) * xratio);
+    float zratio = (zz - (float)z);
 
     return (ab + ((dc - ab) * zratio)) * scaleY;
 }

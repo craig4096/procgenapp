@@ -330,7 +330,7 @@ void TerrainModule::generateTerrain() {
     cout << "Erosion Score: " << activeHeightmap->CalculateErosionScore() << endl;
     cout << "Num Disconnected Regions: " << activeHeightmap->CalculateNumDisconnectedRegions(45.0f) << endl;
 
-    viewport->updateGL();
+    viewport->update();
 }
 
 void TerrainModule::exportTerrain() {

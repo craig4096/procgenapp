@@ -31,6 +31,7 @@ GameDemo::GameDemo()
     , backward(false)
     , left(false)
     , right(false)
+    , flyMode(true)
 {
 }
 
@@ -193,10 +194,10 @@ void GameDemo::mouseReleased() {
 void GameDemo::update(float timeStep) {
     time += timeStep;
 
-    float speed = 4.0f;
+    float speed = 8.0f;
 
     vec3 newPos = playerPos;
-    float ytrans = 0.0f;
+    float ytrans = (flyMode) ? viewDirection.y : 0.0f;
 
     if(forward) {
         newPos += vec3(viewDirection.x, ytrans, viewDirection.z)*speed*timeStep;
@@ -303,15 +304,25 @@ void GameDemo::update(float timeStep) {
             dungeonEntrances[dungeonIndex].waitTime = 10.0f;
         }
     } else {
-        // player is outside - process collision with terrain
-        if(heightmap != NULL) {
-            float height = heightmap->GetWorldHeight(newPos.x, newPos.z)+1;
-            newPos.y = height;
-            // don't let players travel under water level
-            if(newPos.y > waterLevel+0.05f || true) {
-                playerPos = newPos;
+        // player is outside
+        if (flyMode)
+        {
+            playerPos = newPos;
+        }
+        else
+        {
+            // process collision with terrain
+            if(heightmap != NULL) {
+                float height = heightmap->GetWorldHeight(newPos.x, newPos.z)+1;
+                newPos.y = height;
+                // don't let players travel under water level
+                if(newPos.y > waterLevel+0.05f || true) {
+                    playerPos = newPos;
+                }
             }
         }
+
+        playerPos = newPos;
 
         for(int i = 0; i < dungeonEntrances.size(); ++i) {
             DungeonEntrance& de = dungeonEntrances[i];
@@ -378,9 +389,9 @@ void GameDemo::drawMesh(Mesh* mesh) {
     for(int i = 0; i < mesh->getSubMeshCount(); ++i) {
         SubMesh* m = mesh->getSubMesh(i);
         // find the associated shader
-        ShadersMap::iterator i = shaders.find(m->getMaterialName());
-        if(i != shaders.end()) {
-            setShader(i->second);
+        ShadersMap::iterator it = shaders.find(m->getMaterialName());
+        if(it != shaders.end()) {
+            setShader(it->second);
             m->Draw();
             unsetShader(NULL);
         } else {

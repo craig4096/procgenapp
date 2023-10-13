@@ -192,13 +192,13 @@ void BSGModule::clear() {
     shape.calculateBoundingBox(shapeDatabase.getSymbolMeshMap());
     shapeDatabase.insert(shapeDatabase.begin(), shape);
 
-    viewport->updateGL();
+    viewport->update();
 }
 
 void BSGModule::apply() {
     if(activeGrammar != NULL) {
         activeGrammar->generate(shapeDatabase, numIterations);
-        viewport->updateGL();
+        viewport->update();
     }
 }
 

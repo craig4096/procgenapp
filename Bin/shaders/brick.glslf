@@ -5,8 +5,8 @@ uniform float time;
 varying vec3 normal;
 varying vec3 viewSpacePos;
 
-const float BM_WIDTH = 0.35; // brick and mortar combined width
-const float BM_HEIGHT = 0.25; // brick and mortar combined height
+const float BM_WIDTH = 0.35;
+const float BM_HEIGHT = 0.25;
 
 const float MORTAR_THICKNESS = 0.1;
 const float MMW = MORTAR_THICKNESS * 0.5;
@@ -21,7 +21,7 @@ const vec4 CBrick = vec4(0.5, 0.15, 0.14, 1);
 
 vec4 brick_texture(vec2 coord) {
 	float rs, rt, bis, bit, w, h;
-	// relative (to each brick) coordinates
+
 	rs = coord.s / BM_WIDTH;
 	rt = coord.t / BM_HEIGHT;
 
@@ -29,11 +29,11 @@ vec4 brick_texture(vec2 coord) {
 		rs += 0.5;
 	}
 
-	// find which brick in the sequence, brick index
+
 	bis = floor(rs);
 	bit = floor(rt);
 
-	// update relative to brick
+
 	rs = rs - bis;
 	rt = rt - bit;
 

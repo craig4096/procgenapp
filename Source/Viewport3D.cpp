@@ -7,7 +7,7 @@
 using namespace std;
 
 Viewport3D::Viewport3D(const std::string& skyboxDir, float zoomRate, float camMinDist, float camRotWeight, QWidget* parent)
-   : QGLWidget(parent)
+   : QOpenGLWidget(parent)
    , renderer(0)
    , wireframe(false)
    , cameraRadius(200.0f)
@@ -110,11 +110,11 @@ void Viewport3D::mouseReleaseEvent(QMouseEvent* event) {
 
 
 void Viewport3D::wheelEvent(QWheelEvent* event) {
-    cameraRadius -= event->delta() * zoomRate;
+    cameraRadius -= event->angleDelta().y() * zoomRate;
     if(cameraRadius < camMinDist) {
         cameraRadius = camMinDist;
     }
-    updateGL();
+    update();
 }
 
 void Viewport3D::mouseMoveEvent(QMouseEvent* event) {
@@ -130,7 +130,7 @@ void Viewport3D::mouseMoveEvent(QMouseEvent* event) {
         if(camXRotation < 0.01f) {
             camXRotation = 0.01f;
         }
-        updateGL();
+        update();
         prevXPos = event->x();
         prevYPos = event->y();
     }

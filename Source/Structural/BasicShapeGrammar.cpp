@@ -12,14 +12,14 @@ using namespace std;
 
 BasicShapeGrammar::BasicShapeGrammar(const string& filename) {
 
-	ifstream ifs(filename.c_str());
-	if(!ifs.is_open()) {
-		throw std::logic_error("could not open grammar file");
-	}
+    ifstream ifs(filename.c_str());
+    if(!ifs.is_open()) {
+        throw std::logic_error("could not open grammar file");
+    }
 
-	// load the shape rules
-	string token;
-	while(!ifs.eof()) {
+    // load the shape rules
+    string token;
+    while(!ifs.eof()) {
         ifs >> token;
 
         if(token == "class") {
@@ -42,12 +42,12 @@ BasicShapeGrammar::BasicShapeGrammar(const string& filename) {
             cout << "loaded class of size: " << shapeNames.size() << endl;
         } else {
 
-		Rule rule;
+        Rule rule;
         rule.lhsSymbol = token;
-		if(rule.lhsSymbol.empty()) {
-			break;
-		}
-		ifs >> token;
+        if(rule.lhsSymbol.empty()) {
+            break;
+        }
+        ifs >> token;
         rule.filterType = Default;
         if(token == "randsel") {
             rule.filterType = RandSel;
@@ -59,26 +59,26 @@ BasicShapeGrammar::BasicShapeGrammar(const string& filename) {
         if(token != "{") {
             throw std::logic_error("expected { got: " + token + " in " + filename);
         }
-		while(true) {
-			Rule::RHS rhs;
-			ifs >> rhs.symbol;
+        while(true) {
+            Rule::RHS rhs;
+            ifs >> rhs.symbol;
             rhs.isClass = false;
             if(rhs.symbol == "class") {
                 rhs.isClass = true;
                 ifs >> rhs.symbol;
             }
-			ifs >> rhs.translation.x;
-			ifs >> rhs.translation.y;
-			ifs >> rhs.translation.z;
-			ifs >> rhs.yRotation;
+            ifs >> rhs.translation.x;
+            ifs >> rhs.translation.y;
+            ifs >> rhs.translation.z;
+            ifs >> rhs.yRotation;
             rule.rhs.push_back(rhs);
-			ifs >> token;
-			if(token == "}") {
-				break;
-			} else if(token != "|") {
-				throw std::logic_error("expected |");
-			}
-		}
+            ifs >> token;
+            if(token == "}") {
+                break;
+            } else if(token != "|") {
+                throw std::logic_error("expected |");
+            }
+        }
         // load in the probability function
         std::string probname;
         ifs >> probname;
@@ -93,11 +93,11 @@ BasicShapeGrammar::BasicShapeGrammar(const string& filename) {
             rule.probFunc = new RadialProbFunc(pos, minProb, maxProb, radius);
         }
         //ifs >> rule.probability;
-		rules.push_back(rule);
+        rules.push_back(rule);
 
         }
         token.clear();
-	}
+    }
 }
 
 BasicShapeGrammar::~BasicShapeGrammar() {
@@ -133,14 +133,14 @@ std::vector<BasicShapeGrammar::Rule::RHS> BasicShapeGrammar::selectRHS(const Rul
 
 
 vector<Shape> BasicShapeGrammar::applyRule(const Shape& shape, const Rule& rule, const SymbolMeshMap& symbolMeshMap) {
-	std::vector<Shape> rval;
+    std::vector<Shape> rval;
 
     // select the rhs shapes based on the rule filter
     std::vector<Rule::RHS> rhss = selectRHS(rule);
-	// for all rhs of the rule
+    // for all rhs of the rule
     for(int i = 0; i < rhss.size(); ++i) {
         const Rule::RHS& rhs = rhss[i];
-		Shape s;
+        Shape s;
         // if the rhs references a class then stochastically choose
         // a symbol from the class of shapes
         if(rhs.isClass) {
@@ -170,40 +170,40 @@ vector<Shape> BasicShapeGrammar::applyRule(const Shape& shape, const Rule& rule,
         s.calculateBoundingBox(symbolMeshMap);
 
         rval.push_back(s);
-	}
-	return rval;
+    }
+    return rval;
 }
 
 /*
 bool BasicShapeGrammar::isCandidateRule(const std::vector<Shape>& currentShapes, int shapeIndex, const Rule& rule,
-						SymbolMeshMap& symbolMeshMap) {
+                        SymbolMeshMap& symbolMeshMap) {
 //cout << "Testing Candidate Rule" << endl;
-	const Shape& shape = currentShapes[shapeIndex];
-	if(shape.symbol == rule.lhsSymbol) {
-		// test for overlap
-		std::vector<Shape> result = ApplyRule(shape, rule, symbolMeshMap);
-		// test all rhs shapes with all currentShapes
-		bool notOverlapping = true;
-		for(int i = 0; i < result.size() && notOverlapping; ++i) {
-			for(int j = 0; j < currentShapes.size() && notOverlapping; ++j) {
-				// ignore the lhs shape as this will be getting removed
-				if(j == shapeIndex) {
-					continue;
-				}
-				if(result[i].aabb.intersects(currentShapes[j].aabb)) {
+    const Shape& shape = currentShapes[shapeIndex];
+    if(shape.symbol == rule.lhsSymbol) {
+        // test for overlap
+        std::vector<Shape> result = ApplyRule(shape, rule, symbolMeshMap);
+        // test all rhs shapes with all currentShapes
+        bool notOverlapping = true;
+        for(int i = 0; i < result.size() && notOverlapping; ++i) {
+            for(int j = 0; j < currentShapes.size() && notOverlapping; ++j) {
+                // ignore the lhs shape as this will be getting removed
+                if(j == shapeIndex) {
+                    continue;
+                }
+                if(result[i].aabb.intersects(currentShapes[j].aabb)) {
 //cout << "Bounds intersected" << endl;
-					notOverlapping = false;
-				}
-			}
-		}
-		return notOverlapping;
-	}
-	return false;
+                    notOverlapping = false;
+                }
+            }
+        }
+        return notOverlapping;
+    }
+    return false;
 }
 
 
 float randf() {
-	return rand() / (float)RAND_MAX;
+    return rand() / (float)RAND_MAX;
 }
 */
 
@@ -211,64 +211,64 @@ int BasicShapeGrammar::selectRule(const Shape& shape, const vector<Rule>& rules)
     // selects a rule based on its probability distribution(function)
     // create tmp array of probabilities for each candidate rule
     vector<float> probs(rules.size());
-	float total = 0.0f;
-	for(int i = 0; i < rules.size(); ++i) {
+    float total = 0.0f;
+    for(int i = 0; i < rules.size(); ++i) {
         probs[i] = rules[i].probFunc->getProbability(shape.position);
         total += probs[i];
-	}
+    }
     if(total == 0.0f) {
         return -1;
     }
     float r = randomf() * total;
-	int index = 0;
+    int index = 0;
     while(r > probs[index]) {
         r -= probs[index];
-		index++;
-	}
-	return index;
+        index++;
+    }
+    return index;
 }
 /*
 void BasicShapeGrammar::Generate(vector<Shape>& shapes, int maxDepth, SymbolMeshMap& symbolMeshMap) {
-	for(int i = 0; i < maxDepth; ++i) {
+    for(int i = 0; i < maxDepth; ++i) {
         /*
 cout << "===================" << i << " (" << shapes.size() << ") ============================" << endl;
 for(int h = 0; h < shapes.size(); ++h) {
-	cout << shapes[h].symbol << " ";
+    cout << shapes[h].symbol << " ";
 }
 cout << endl;
 
 
-		bool canTerminate = true;
-		for(int j = 0; j < shapes.size();) {
-			vector<Rule> candidateRules;
-			for(int k = 0; k < rules.size(); ++k) {
-				if(isCandidateRule(shapes, j, rules[k], symbolMeshMap)) {
-					candidateRules.push_back(rules[k]);
+        bool canTerminate = true;
+        for(int j = 0; j < shapes.size();) {
+            vector<Rule> candidateRules;
+            for(int k = 0; k < rules.size(); ++k) {
+                if(isCandidateRule(shapes, j, rules[k], symbolMeshMap)) {
+                    candidateRules.push_back(rules[k]);
 //cout << "candidate rule (" << rules[k].probability << ")" << endl;
-					canTerminate = false;
-				}
-			}
+                    canTerminate = false;
+                }
+            }
 //cout << candidateRules.size() << " Candidate Rules added" << endl;
-			if(candidateRules.size() == 0) {
-				++j;
-				continue;
-			}
+            if(candidateRules.size() == 0) {
+                ++j;
+                continue;
+            }
             int index = SelectRule(shapes[j], candidateRules);
-			// apply the rule to the shape and add the results to the shapes array
-			vector<Shape> result = ApplyRule(shapes[j], candidateRules[index], symbolMeshMap);
+            // apply the rule to the shape and add the results to the shapes array
+            vector<Shape> result = ApplyRule(shapes[j], candidateRules[index], symbolMeshMap);
 //cout << "selected rule: " << index << endl;
-			// remove the lhs of the rule from the shapes array
-			shapes.erase(shapes.begin()+j);
+            // remove the lhs of the rule from the shapes array
+            shapes.erase(shapes.begin()+j);
 
-			// and replace with the rhs
-			shapes.insert(shapes.begin()+j, result.begin(), result.end());
-			j += result.size();
-		}
+            // and replace with the rhs
+            shapes.insert(shapes.begin()+j, result.begin(), result.end());
+            j += result.size();
+        }
 //cout << "================================================================" << endl;
 //if(canTerminate) {
 //	break;
 //}
-	}
+    }
 }
 */
 

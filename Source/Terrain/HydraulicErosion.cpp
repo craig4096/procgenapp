@@ -1,5 +1,5 @@
 #include "HydraulicErosion.h"
-#include <QTime>
+#include <QElapsedTimer>
 #include <fstream>
 #include <iostream>
 #include "defs.h"
@@ -24,7 +24,7 @@ void HydraulicErosion::operate(HeightmapStack* stack, Progress* progress) {
     Array2D<float>	water(h->GetWidth(), h->GetHeight());		// 2d array holds water values
     Array2D<float>	sediment(h->GetWidth(), h->GetHeight());	// 2d array holds sediment values
 
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
     // initialize water and sediment to 0
     for(int i = 0; i < water.GetSize(); ++i) {

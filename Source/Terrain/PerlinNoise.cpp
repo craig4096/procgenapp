@@ -1,6 +1,6 @@
 #include "PerlinNoise.h"
 #include <iostream>
-#include <QTime>
+#include <QElapsedTimer>
 #include <cstdlib>
 using namespace std;
 
@@ -20,7 +20,7 @@ float PerlinNoise::RandomFloat() {
 }
 
 void PerlinNoise::initializeGradientTable() {
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
     srand(seed);
     for(int x = 0; x < GRADIENT_TABLE_SIZE; ++x) {
@@ -101,7 +101,7 @@ float PerlinNoise::GenerateHeightValue(float x, float y) {
 
 
 void PerlinNoise::operate(HeightmapStack* stack, Progress* progress) {
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
     // create a new heightmap
     Heightmap* h = stack->createNewHeightmap();

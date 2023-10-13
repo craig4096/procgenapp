@@ -75,6 +75,8 @@ class GameDemo {
     // saved view matrix for each frame (used for setting lightDir in shaders)
     matrix4 viewMat;
 
+    bool flyMode;
+
 public:
     GameDemo();
     ~GameDemo();

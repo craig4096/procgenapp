@@ -2,6 +2,7 @@
 #include "Shape.h"
 #include "Mesh.h"
 #include <stdexcept>
+#include <iostream>
 using namespace std;
 
 void Shape::calculateBoundingBox(const SymbolMeshMap& symbolMeshMap) {
