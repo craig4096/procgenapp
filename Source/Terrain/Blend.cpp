@@ -22,6 +22,11 @@ void Blend::operate(HeightmapStack* stack, Progress* progress) {
     delete b;
 }
 
+void Blend::inspect(IPropertyInspector& inspector)
+{
+    inspector.property("Blend Factor", blendFactor); // range 0-1
+}
+
 void Blend::setBlendFactor(float b) {
     blendFactor = b;
 }

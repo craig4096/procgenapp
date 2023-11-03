@@ -7,7 +7,8 @@ namespace terrain_ops {
 
 class Modulate : public TerrainOperation {
 public:
-    void operate(HeightmapStack*, Progress*);
+    void operate(HeightmapStack*, Progress*) override;
+    void inspect(IPropertyInspector& inspector) override;
 };
 
 }

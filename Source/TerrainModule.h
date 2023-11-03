@@ -4,6 +4,7 @@
 #include <vector>
 #include <QObject>
 #include <QModelIndex>
+#include <QStandardItemModel>
 #include "GL/glew.h"
 #include "Viewport3D.h"
 #include "Heightmap.h"
@@ -29,6 +30,8 @@ class TerrainModule : public QObject, public Viewport3D::Renderer, public Progre
     // the applications ui object
     Ui::Application* ui;
 
+    QStandardItemModel* propertyModel;
+
     // currently selected terrain operation
     int curSelected;
 
@@ -43,54 +46,11 @@ class TerrainModule : public QObject, public Viewport3D::Renderer, public Progre
 
     void updateActiveList();
 
-    template <class T>
-    T* getCurOp() { return dynamic_cast<T*>(generator.getOperation(curSelected)); }
+    bool repopulating;
 
 private slots:
-    // functions for each individual terrain operation--
-    // -------------------------------------------------
-    // normalization
-    void t_normSetMin(double);
-    void t_normSetMax(double);
 
-    // blending
-    void t_setBlendFactor(int);
-
-    // perlin noise
-    void t_perlinSetSeed(int);
-    void t_perlinSetStartOctave(int);
-    void t_perlinSetEndOctave(int);
-    void t_perlinSetPersistance(int);
-
-    // voronoi diagram
-    void t_voronoiSetSeed(int);
-    void t_voronoiSetNumPoints(int);
-    void t_voronoiSetBlendA(double);
-    void t_voronoiSetBlendB(double);
-
-    // voronoi stencil
-    void t_vstencilSetSeed(int);
-    void t_vstencilSetNumPoints(int);
-    void t_vstencilSetProbability(int);
-    void t_vstencilSetBlackValue(double);
-    void t_vstencilSetWhiteValue(double);
-
-    // thermal erosion
-    void t_thermalSetNumIterations(int);
-    void t_thermalSetTalusAngle(double);
-
-    // hydraulic erosion
-    void t_hydraulicSetWaterConst(double);
-    void t_hydraulicSetSolubility(double);
-    void t_hydraulicSetSedimentCapacity(double);
-    void t_hydraulicSetEvaporationCoef(double);
-    void t_hydraulicSetNumIterations(int);
-
-    // inverse thermal erosion
-    void t_invthermalSetNumIterations(int);
-    void t_invthermalSetTalusAngle(double);
-    // -------------------------------------------------
-
+    void onPropertyChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
     void addOperation();
     void removeOperation();

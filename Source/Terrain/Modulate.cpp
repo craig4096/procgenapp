@@ -17,4 +17,9 @@ void Modulate::operate(HeightmapStack* stack, Progress* progress) {
     delete b;
 }
 
+void Modulate::inspect(IPropertyInspector& inspector)
+{
+    // no properties
+}
+
 }

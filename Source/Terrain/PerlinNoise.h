@@ -37,7 +37,8 @@ public:
     float GenerateHeightValue(float x, float y);
 
     // generates a heightmap and pushes onto stack
-    void operate(HeightmapStack*, Progress*);
+    void operate(HeightmapStack*, Progress*) override;
+    void inspect(IPropertyInspector& inspector) override;
 
     void setStartOctave(int);
     int getStartOctave() const { return startOctave; }

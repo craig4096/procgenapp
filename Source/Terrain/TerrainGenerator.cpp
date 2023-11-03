@@ -42,7 +42,11 @@ Heightmap* TerrainGenerator::generateTerrain(Progress* progress) {
 }
 
 TerrainOperation* TerrainGenerator::getOperation(int index) {
-    return operations[index];
+    if (index >= 0 && index < operations.size())
+    {
+        return operations[index];
+    }
+    return nullptr;
 }
 
 void TerrainGenerator::switchOperations(int indexA, int indexB) {

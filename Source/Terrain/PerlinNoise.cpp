@@ -120,6 +120,14 @@ void PerlinNoise::operate(HeightmapStack* stack, Progress* progress) {
     stack->push(h);
 }
 
+void PerlinNoise::inspect(IPropertyInspector& inspector)
+{
+    inspector.property("Start Octave", startOctave);
+    inspector.property("End Octave", endOctave);
+    inspector.property("Persistance", persistance); // range 0-1
+    inspector.property("Seed", seed);
+}
+
 void PerlinNoise::setStartOctave(int startOctave) {
     this->startOctave = startOctave;
 }

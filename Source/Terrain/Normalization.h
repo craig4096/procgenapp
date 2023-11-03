@@ -10,7 +10,9 @@ class Normalization : public TerrainOperation {
 public:
     Normalization();
 
-    void operate(HeightmapStack*, Progress*);
+    void operate(HeightmapStack*, Progress*) override;
+    void inspect(IPropertyInspector& inspector) override;
+
     void setMinRange(float);
     void setMaxRange(float);
     float getMinRange() const { return minRange; }

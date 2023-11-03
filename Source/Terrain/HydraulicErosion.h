@@ -16,7 +16,9 @@ class HydraulicErosion : public TerrainOperation {
 public:
     HydraulicErosion();
     
-    void operate(HeightmapStack*, Progress*);
+    void operate(HeightmapStack*, Progress*) override;
+    void inspect(IPropertyInspector& inspector) override;
+
     void setWaterConst(float);
     void setSolubility(float);
     void setEvaporationCoefficient(float);

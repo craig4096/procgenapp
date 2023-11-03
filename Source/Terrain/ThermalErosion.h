@@ -13,7 +13,9 @@ class ThermalErosion : public TerrainOperation {
 public:
     ThermalErosion();
     
-    void operate(HeightmapStack*, Progress*);
+    void operate(HeightmapStack*, Progress*) override;
+    void inspect(IPropertyInspector& inspector) override;
+
     void setNumIterations(int);
     void setTalusAngle(float);
 

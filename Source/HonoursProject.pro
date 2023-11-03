@@ -50,6 +50,7 @@ SOURCES += main.cpp\
 HEADERS  += \
     Heightmap.h \
     Application.h \
+    IPropertyInspector.h \
     math3d.h \
     Array2D.h \
     TerrainModule.h \

@@ -15,6 +15,12 @@ void Normalization::operate(HeightmapStack* stack, Progress* progress) {
     stack->push(h);
 }
 
+void Normalization::inspect(IPropertyInspector& inspector)
+{
+    inspector.property("Min Range", minRange);
+    inspector.property("Max Range", maxRange);
+}
+
 void Normalization::setMinRange(float min) {
     minRange = min;
 }

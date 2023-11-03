@@ -56,6 +56,15 @@ void VoronoiStencil::operate(HeightmapStack* stack, Progress* progress) {
     stack->push(h);
 }
 
+void VoronoiStencil::inspect(IPropertyInspector& inspector)
+{
+    inspector.property("Probability", probabilityFactor);
+    inspector.property("Num Points", numFeaturePoints);
+    inspector.property("Seed", seed);
+    inspector.property("White Value", whiteValue);
+    inspector.property("Black Value", blackValue);
+}
+
 void VoronoiStencil::setProbabilityFactor(float p) {
     probabilityFactor = p;
 }

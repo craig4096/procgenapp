@@ -147,6 +147,14 @@ void HydraulicErosion::operate(HeightmapStack* stack, Progress* progress) {
     stack->push(h);
 }
 
+void HydraulicErosion::inspect(IPropertyInspector& inspector)
+{
+    inspector.property("Water Const", waterConst);
+    inspector.property("Solubility", solubility);
+    inspector.property("Evaporation Coef.", evaporationCoef);
+    inspector.property("Sediment Capacity", sedimentCapacity);
+    inspector.property("Num Iterations", numIterations);
+}
 
 void HydraulicErosion::setWaterConst(float waterConst) {
     this->waterConst = waterConst;

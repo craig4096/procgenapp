@@ -15,7 +15,9 @@ class VoronoiDiagram : public TerrainOperation {
 public:
     VoronoiDiagram();
 
-    void operate(HeightmapStack*, Progress*);
+    void operate(HeightmapStack*, Progress*) override;
+    void inspect(IPropertyInspector& inspector) override;
+
     void setBlendWeightA(float);
     float getBlendWeightA() const { return blendWeightA; }
     void setBlendWeightB(float);

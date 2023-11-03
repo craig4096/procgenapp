@@ -93,6 +93,12 @@ void ThermalErosion::operate(HeightmapStack* stack, Progress* progress) {
     stack->push(h);
 }
 
+void ThermalErosion::inspect(IPropertyInspector& inspector)
+{
+    inspector.property("Num Iterations", numIterations);
+    inspector.property("Talus Angle", talusAngle);
+}
+
 void ThermalErosion::setNumIterations(int numIterations) {
     this->numIterations = numIterations;
 }

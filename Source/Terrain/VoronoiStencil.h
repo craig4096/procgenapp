@@ -18,7 +18,9 @@ class VoronoiStencil : public TerrainOperation {
 public:
     VoronoiStencil();
 
-    void operate(HeightmapStack*, Progress*);
+    void operate(HeightmapStack*, Progress*) override;
+    void inspect(IPropertyInspector& inspector) override;
+
     void setProbabilityFactor(float);
     float getProbabilityFactor() const { return probabilityFactor; }
     void setSeed(int);

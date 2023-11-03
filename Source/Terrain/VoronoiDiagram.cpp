@@ -5,10 +5,10 @@ using namespace std;
 namespace terrain_ops {
 
 VoronoiDiagram::VoronoiDiagram()
-    : numFeaturePoints(100)
-    , seed(0)
-    , blendWeightA(-1.0f)
+    : blendWeightA(-1.0f)
     , blendWeightB(1.0f)
+    , seed(0)
+    , numFeaturePoints(100)
 {
 }
 
@@ -62,6 +62,14 @@ void VoronoiDiagram::operate(HeightmapStack* stack, Progress* progress) {
     }
     h->Normalize(0, 1);
     stack->push(h);
+}
+
+void VoronoiDiagram::inspect(IPropertyInspector& inspector)
+{
+    inspector.property("Weight A", blendWeightA);
+    inspector.property("Weight B", blendWeightB);
+    inspector.property("Seed", seed);
+    inspector.property("Num Points", numFeaturePoints);
 }
 
 void VoronoiDiagram::setBlendWeightA(float a) {

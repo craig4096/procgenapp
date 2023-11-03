@@ -11,7 +11,9 @@ class Blend : public TerrainOperation
 public:
     Blend();
 
-    void operate(HeightmapStack*, Progress*);
+    void operate(HeightmapStack*, Progress*) override;
+    void inspect(IPropertyInspector& inspector) override;
+
     void setBlendFactor(float);
     float getBlendFactor() const;
 };
