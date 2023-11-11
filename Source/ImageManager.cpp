@@ -1,57 +1,66 @@
 
 #include "ImageManager.h"
-#include <QImage>
+#include <wx/image.h>
 
-void ImageManager::SaveAsJpeg(const Array2D<float>& array, const char* filename, const ColorSpline& spline) {
-    QImage img(array.GetWidth(), array.GetHeight(), QImage::Format_RGB32);
+void ImageManager::SaveAsJpeg(const Array2D<float>& array, const char* filename, const ColorSpline& spline)
+{
+    wxImage img(array.GetWidth(), array.GetHeight());
     int j = 0;
-    for(int x = 0; x < img.width(); ++x) {
-        for(int y = 0; y < img.height(); ++y) {
+    for (int x = 0; x < img.GetWidth(); ++x)
+    {
+        for (int y = 0; y < img.GetHeight(); ++y)
+        {
             Color c = spline.GetColor(array.GetValue(j++));
 
-            img.setPixelColor(x, y, QColor(c.red * 255, c.green * 255, c.blue * 255));
+            img.SetRGB(x, y, c.red * 255, c.green * 255, c.blue * 255);
         }
     }
-    img.save(filename);
+    img.SaveFile(filename);
 }
 
 
-void ImageManager::SaveAsJpeg(const Array2D<float>& array, const char* filename) {
-    QImage img(array.GetWidth(), array.GetHeight(), QImage::Format_RGB32);
+void ImageManager::SaveAsJpeg(const Array2D<float>& array, const char* filename)
+{
+    wxImage img(array.GetWidth(), array.GetHeight());
 
     int j = 0;
-    for(int x = 0; x < array.GetWidth(); ++x) {
-        for (int y = 0; y < array.GetHeight(); ++y) {
+    for (int x = 0; x < array.GetWidth(); ++x)
+    {
+        for (int y = 0; y < array.GetHeight(); ++y)
+        {
 
-            float r = array.GetValue(j++) * 255;
-            float g = array.GetValue(j++) * 255;
-            float b = array.GetValue(j++) * 255;
+            unsigned char r = array.GetValue(j++) * 255;
+            unsigned char g = array.GetValue(j++) * 255;
+            unsigned char b = array.GetValue(j++) * 255;
 
-            img.setPixelColor(x, y, QColor(r, g, b));
+            img.SetRGB(x, y, r, g, b);
         }
     }
-    img.save(filename);
+    img.SaveFile(filename);
 }
 
 
 // converts to a interlaced RGB image
-unsigned char* ConvertImage(const QImage& img) {
-    unsigned char* pixels = new unsigned char[img.width() * img.height() * 3];
+unsigned char* ConvertImage(const wxImage& img)
+{
+    unsigned char* pixels = new unsigned char[img.GetWidth() * img.GetHeight() * 3];
     int i = 0;
-    for(int x = 0; x < img.width(); ++x) {
-        for(int y = 0; y < img.height(); ++y) {
-            QColor color = img.pixelColor(x, y);
-            pixels[i++] = color.red();
-            pixels[i++] = color.green();
-            pixels[i++] = color.blue();
+    for (int x = 0; x < img.GetWidth(); ++x)
+    {
+        for (int y = 0; y < img.GetHeight(); ++y)
+        {
+            pixels[i++] = img.GetRed(x, y);
+            pixels[i++] = img.GetGreen(x, y);
+            pixels[i++] = img.GetBlue(x, y);
         }
     }
     return pixels;
 }
 
-GLuint ImageManager::LoadTexture(const char* filename) {
-    QImage img;
-    if (!img.load(filename))
+GLuint ImageManager::LoadTexture(const char* filename)
+{
+    wxImage img;
+    if (!img.LoadFile(filename))
         return -1;
 
     glEnable(GL_TEXTURE_2D);
@@ -61,7 +70,7 @@ GLuint ImageManager::LoadTexture(const char* filename) {
 
     unsigned char* pixels = ConvertImage(img);
 
-    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, img.width(), img.height(), GL_RGB, GL_UNSIGNED_BYTE, pixels);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, 3, img.GetWidth(), img.GetHeight(), GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -76,32 +85,31 @@ GLuint ImageManager::LoadTexture(const char* filename) {
     return texture;
 }
 
-GLuint ImageManager::LoadAlphaTexture(const char* filename) {
-    QImage img;
-    if (!img.load(filename))
+GLuint ImageManager::LoadAlphaTexture(const char* filename)
+{
+    wxImage img;
+    if (!img.LoadFile(filename))
         return -1;
-    //if(img.spectrum() != 4) {
-    //    exit(0);
-   // }
 
     glEnable(GL_TEXTURE_2D);
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    unsigned char* pixels = new unsigned char[img.width() * img.height() * 4];
+    unsigned char* pixels = new unsigned char[img.GetWidth() * img.GetHeight() * 4];
     int i = 0;
-    for(int x = 0; x < img.width(); ++x) {
-        for(int y = 0; y < img.height(); ++y) {
-            QColor color = img.pixelColor(x, y);
-            pixels[i++] = color.red();
-            pixels[i++] = color.green();
-            pixels[i++] = color.blue();
-            pixels[i++] = color.alpha();
+    for (int x = 0; x < img.GetWidth(); ++x)
+    {
+        for (int y = 0; y < img.GetHeight(); ++y)
+        {
+            pixels[i++] = img.GetRed(x, y);
+            pixels[i++] = img.GetGreen(x, y);
+            pixels[i++] = img.GetBlue(x, y);
+            pixels[i++] = img.GetAlpha(x, y);
         }
     }
 
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, img.width(), img.height(), GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, img.GetWidth(), img.GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -118,13 +126,11 @@ GLuint ImageManager::LoadAlphaTexture(const char* filename) {
 
 GLuint ImageManager::LoadSkyboxTexture(const char* filename)
 {
-    QImage img(filename);
-    if (!img.load(filename))
+    wxImage img;
+    if (!img.LoadFile(filename))
         return -1;
 
-    QTransform transform;
-    transform.rotate(90);
-    img = img.transformed(transform);
+    img = img.Rotate90();
 
     glEnable(GL_TEXTURE_2D);
 
@@ -134,7 +140,7 @@ GLuint ImageManager::LoadSkyboxTexture(const char* filename)
 
     unsigned char* pixels = ConvertImage(img);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.width(), img.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.GetWidth(), img.GetHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
     // set the texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

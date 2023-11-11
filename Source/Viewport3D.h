@@ -2,14 +2,15 @@
 #define VIEWPORT3D_H
 
 #include "GL/glew.h"
-#include <QOpenGLWidget>
+#include <wx/glcanvas.h>
 #include "math3d.h"
 #include "Skybox.h"
 
-class Viewport3D : public QOpenGLWidget {
-    Q_OBJECT
+class Viewport3D : public wxGLCanvas
+{
 public:
-    class Renderer {
+    class Renderer
+    {
     public:
         virtual void viewportInit(Viewport3D*) = 0;
         virtual void viewportDraw(Viewport3D*) = 0;
@@ -22,7 +23,6 @@ private:
     float       camYRotation;
     float       camXRotation;
     bool        draggingLeftMouse;
-    bool        wireframe;
     int         prevXPos;
     int         prevYPos;
     Skybox*     skybox;
@@ -33,20 +33,22 @@ private:
 
     matrix4     viewMatrix;
 
+    wxGLContext* context;
 public:
-    explicit Viewport3D(const std::string& skyboxDir, float zoomRate, float camMinDist, float camRotWeight, QWidget *parent = 0);
-    
+    explicit Viewport3D(wxWindow* parent, Renderer* renderer, const std::string& skyboxDir, float zoomRate, float camMinDist, float camRotWeight);
+    ~Viewport3D();
 
     const matrix4& getViewMatrix() const { return viewMatrix; }
 
-    void initializeGL() override;
-    void resizeGL(int width, int height) override;
-    void paintGL() override;
-    void setRenderer(Renderer*);
-    void mousePressEvent(QMouseEvent*) override;
-    void mouseReleaseEvent(QMouseEvent*) override;
-    void mouseMoveEvent(QMouseEvent*) override;
-    void wheelEvent(QWheelEvent*) override;
+    void resizeGL(wxSizeEvent& event);
+    void paintGL(wxPaintEvent& event);
+
+    void mouseLeftDownEvent(wxMouseEvent& event);
+    void mouseLeftUpEvent(wxMouseEvent& event);
+    void mouseMoveEvent(wxMouseEvent& event);
+    void wheelEvent(wxMouseEvent& event);
+
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // VIEWPORT3D_H

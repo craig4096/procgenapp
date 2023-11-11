@@ -9,36 +9,44 @@ ShapeDatabase::ShapeDatabase()
 {
     static const float FMAX = 100000.0f;
 
-    globalConstraint.min = vec3(-FMAX, -FMAX,-FMAX);
+    globalConstraint.min = vec3(-FMAX, -FMAX, -FMAX);
     globalConstraint.max = vec3(FMAX, FMAX, FMAX);
     gridCellSize = vec3(5.0f, 5.0f, 5.0f);
 }
 
-ShapeDatabase::~ShapeDatabase() {
+ShapeDatabase::~ShapeDatabase()
+{
     // delete all mesh objects in the symbolMeshMap
-    for(map<string, Mesh*>::iterator i = meshMap.begin(); i != meshMap.end(); ++i) {
+    for (map<string, Mesh*>::iterator i = meshMap.begin(); i != meshMap.end(); ++i)
+    {
         delete i->second;
     }
 }
 
-void ShapeDatabase::loadSymbolMeshMap(const char* filename) {
+void ShapeDatabase::loadSymbolMeshMap(const char* filename)
+{
     // load the symbol mesh map
     std::ifstream ifs(filename);
-    if(!ifs.is_open()) {
+    if (!ifs.is_open())
+    {
         throw std::logic_error("could not open mapping file");
     }
 
-    while(!ifs.eof()) {
+    while (!ifs.eof())
+    {
         std::string symbol, mesh;
         ifs >> symbol >> mesh;
-        if(symbol.empty() || mesh.empty()) break;
+        if (symbol.empty() || mesh.empty()) break;
 
         // if the mesh has aready been loaded
-        map<string,Mesh*>::const_iterator i = meshMap.find(mesh);
-        if(i != meshMap.end()) {
+        map<string, Mesh*>::const_iterator i = meshMap.find(mesh);
+        if (i != meshMap.end())
+        {
             // assign (already loaded) mesh to symbol map
             symbolMeshMap[symbol] = meshMap[mesh];
-        } else {
+        }
+        else
+        {
             //cout << "adding symbol to mesh map: " << symbol << endl;
             cout << "loading mesh: " << symbol << endl;
             Mesh* m = new Mesh(mesh);
@@ -49,7 +57,8 @@ void ShapeDatabase::loadSymbolMeshMap(const char* filename) {
     }
 }
 
-ShapeDatabase::GridRange ShapeDatabase::getGridRange(const BoundingBox& aabb) const {
+ShapeDatabase::GridRange ShapeDatabase::getGridRange(const BoundingBox& aabb) const
+{
     GridRange g;
     g.startX = (int)floor(aabb.min.x / gridCellSize.x);
     g.startY = (int)floor(aabb.min.y / gridCellSize.y);
@@ -61,7 +70,8 @@ ShapeDatabase::GridRange ShapeDatabase::getGridRange(const BoundingBox& aabb) co
 }
 
 
-bool ShapeDatabase::occlusionTest(const BoundingBox& aabb, const Shape* ignore) const  {
+bool ShapeDatabase::occlusionTest(const BoundingBox& aabb, const Shape* ignore) const
+{
     /*
     // first find the range of grid cells that the shape intersects
     // with
@@ -96,20 +106,24 @@ bool ShapeDatabase::occlusionTest(const BoundingBox& aabb, const Shape* ignore) 
     }
     return false;
 */
-    if(!aabb.inside(globalConstraint)) {
+    if (!aabb.inside(globalConstraint))
+    {
         return true;
     }
 
-    for(list<Shape>::const_iterator i = shapes.begin(); i != shapes.end(); ++i) {
-        if(&(*i) != ignore && intersects(aabb, i->aabb)) {
+    for (list<Shape>::const_iterator i = shapes.begin(); i != shapes.end(); ++i)
+    {
+        if (&(*i) != ignore && intersects(aabb, i->aabb))
+        {
             return true;
         }
     }
     return false;
 }
 
-bool ShapeDatabase::intersects(const BoundingBox& a, const BoundingBox& b) {
-    static const vec3 EPSILON(0.001f,0.001f,0.001f);
+bool ShapeDatabase::intersects(const BoundingBox& a, const BoundingBox& b)
+{
+    static const vec3 EPSILON(0.001f, 0.001f, 0.001f);
     // shrink the 'b' bounding box by EPSILON
     BoundingBox tmp;
     tmp.min = b.min + EPSILON;
@@ -118,7 +132,8 @@ bool ShapeDatabase::intersects(const BoundingBox& a, const BoundingBox& b) {
     return a.intersects(tmp);
 }
 
-ShapeDatabase::iterator ShapeDatabase::insert(iterator pos, const Shape& shape) {
+ShapeDatabase::iterator ShapeDatabase::insert(iterator pos, const Shape& shape)
+{
     //cout << "inserting shape " << shape.symbol << endl;
     // insert the shape into the list, storing the new pos in rval
     iterator rval = shapes.insert(pos, shape);
@@ -156,7 +171,8 @@ ShapeDatabase::iterator ShapeDatabase::insert(iterator pos, const Shape& shape) 
     cout << "end inserting shape" << endl;
 }
 
-ShapeDatabase::iterator ShapeDatabase::remove(iterator pos) {
+ShapeDatabase::iterator ShapeDatabase::remove(iterator pos)
+{
     /*
    // cout << "removing shape" << endl;
     // need to remove this from the grid map aswell
@@ -193,11 +209,13 @@ ShapeDatabase::iterator ShapeDatabase::remove(iterator pos) {
 }
 
 
-void ShapeDatabase::setGlobalConstraint(const BoundingBox& bb) {
+void ShapeDatabase::setGlobalConstraint(const BoundingBox& bb)
+{
     globalConstraint = bb;
 }
 
-void ShapeDatabase::clear() {
+void ShapeDatabase::clear()
+{
     shapes.clear();
     grid.clear();
 }

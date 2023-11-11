@@ -11,7 +11,7 @@ Color::Color(float red, float green, float blue)
 {
 }
 
-Color Color::lerp(const Color &o, float t) const
+Color Color::lerp(const Color& o, float t) const
 {
     return Color(
         red + (o.red - red) * t,

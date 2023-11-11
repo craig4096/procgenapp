@@ -5,6 +5,7 @@ ConstProbFunc::ConstProbFunc(float value)
 {
 }
 
-float ConstProbFunc::getProbability(const vec3& pos) {
+float ConstProbFunc::getProbability(const vec3& pos)
+{
     return value;
 }

@@ -4,7 +4,8 @@
 #include "math3d.h"
 #include <string>
 
-struct Skybox {
+struct Skybox
+{
     GLuint vertices;
     GLuint texcoords;
     GLuint textures[6];

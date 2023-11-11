@@ -10,7 +10,8 @@ class Mesh;
 
 typedef std::map<std::string, Mesh*> SymbolMeshMap;
 
-struct Shape {
+struct Shape
+{
     std::string symbol;
     // absolute position and rotation
     vec3 position;

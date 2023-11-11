@@ -1,69 +1,39 @@
 #include "Application.h"
-#include "ui_application.h"
 #include <iostream>
-#include <QTime>
-#include <QGuiApplication>
-#include <QScreen>
 using namespace std;
 
-Application::Application(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::Application)
+wxIMPLEMENT_APP(Application);
+
+Application::Application()
 {
-
-    ui->setupUi(this);
-
-    // centre and size the window
-    QScreen* screen = QGuiApplication::primaryScreen();
-    QRect r = screen->availableGeometry();
-    int width = (0.7f * r.width());
-    int height = (0.6f * r.height());
-
-    this->setGeometry(QRect((r.width() - width) / 2, (r.height() - height) / 2,
-                            width, height));
-
-    // create the three different application modules
-    terrainModule = new TerrainModule(ui);
-    bsgModule = new BSGModule(ui);
-    proctexModule = new ProcTexturingModule(ui);
-    gameModule = new GameModule(ui);
-
-    connect(ui->gameBegin, SIGNAL(triggered()), this, SLOT(gameBegin()));
-
-    connect(ui->actionTerrain, SIGNAL(triggered()), this, SLOT(switchToTerrain()));
-    connect(ui->actionBSG, SIGNAL(triggered()), this, SLOT(switchToBSG()));
-    connect(ui->actionTexturing, SIGNAL(triggered()), this, SLOT(switchToTexturing()));
 }
 
 Application::~Application()
 {
-    delete ui;
     delete terrainModule;
     delete bsgModule;
     delete proctexModule;
-    delete gameModule;
+    //delete gameModule; // game module extends wxGLCanvas therefore is cleaned up automatically
 }
 
+bool Application::OnInit()
+{
+    wxInitAllImageHandlers();
 
-void Application::gameBegin() {
-    ui->stackedWidget_2->setCurrentWidget(ui->game_page);
-    gameModule->begin();
-}
+    mainWindow = new MainWindow(nullptr);
+    terrainModule = new TerrainModule(mainWindow);
+    bsgModule = new BSGModule(mainWindow);
+    proctexModule = new ProcTexturingModule(mainWindow);
+    gameModule = new GameModule(mainWindow);
 
-void Application::gameEnd() {
-    ui->stackedWidget_2->setCurrentWidget(ui->terrain_page);
-    gameModule->end();
-}
+    const wxSize desktopSize = wxGetDisplaySize();
+    const wxSize frameSize = wxSize(desktopSize.GetWidth() / 2, desktopSize.GetHeight() / 2);
+    const int xPos = (desktopSize.GetWidth() - frameSize.GetWidth()) / 2;
+    const int yPos = (desktopSize.GetHeight() - frameSize.GetHeight()) / 2;
 
+    mainWindow->SetPosition(wxPoint(xPos, yPos));
+    mainWindow->SetSize(frameSize);
 
-void Application::switchToTerrain() {
-    ui->stackedWidget_2->setCurrentWidget(ui->terrain_page);
-}
-
-void Application::switchToBSG() {
-    ui->stackedWidget_2->setCurrentWidget(ui->bsg_page);
-}
-
-void Application::switchToTexturing() {
-    ui->stackedWidget_2->setCurrentWidget(ui->texturing_page);
+    mainWindow->Show();
+    return true;
 }

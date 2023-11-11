@@ -4,7 +4,8 @@
 #include "Color.h"
 
 // maps a scalar value between (0 and 1) to a color
-class ColorSpline {
+class ColorSpline
+{
     std::vector<Color> colors;
 public:
     void AddColor(const Color& color);

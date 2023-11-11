@@ -6,9 +6,9 @@
 
 class RenderableHeightmap : public Heightmap
 {
-    vec3*	normals;
-    vec3*	vertices;
-    int*	indices;
+    vec3* normals;
+    vec3* vertices;
+    int* indices;
 
     GLuint	vertexBuffer;
     GLuint	normalBuffer;

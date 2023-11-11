@@ -2,25 +2,20 @@
 #define TERRAINMODULE_H
 
 #include <vector>
-#include <QObject>
-#include <QModelIndex>
-#include <QStandardItemModel>
 #include "GL/glew.h"
 #include "Viewport3D.h"
 #include "Heightmap.h"
 #include "RenderableHeightmap.h"
 #include "Terrain/TerrainGenerator.h"
+#include "MainWindow.h"
 
 class TerrainOperation;
-namespace Ui {
-    class Application;
-}
 
 // This class represents the main terrain application, it's main purpose it to
 // create an interface between the user and the terrain generator class, i.e. it
 // can be considered as the 'Controller' in the MVC design pattern
-class TerrainModule : public QObject, public Viewport3D::Renderer, public Progress {
-    Q_OBJECT
+class TerrainModule : public Viewport3D::Renderer, public Progress
+{
     // the widget used for rendering the GL scene
     Viewport3D* viewport;
 
@@ -28,30 +23,21 @@ class TerrainModule : public QObject, public Viewport3D::Renderer, public Progre
     TerrainGenerator generator;
 
     // the applications ui object
-    Ui::Application* ui;
-
-    QStandardItemModel* propertyModel;
+    MainWindow* mainWindow;
 
     // currently selected terrain operation
     int curSelected;
+
+    bool repopulating;
 
     // when a terrain is generated it is passed to RenderableHeightmap's
     // constructor so the user can see the results
     RenderableHeightmap* activeHeightmap;
 
-    // deselects an operation from the list (switches tab and disconnects slots and signals)
-    void deselectOperation(TerrainOperation*);
     // selects an operation from the list (switches tab connects signals and slots)
     void selectOperation(TerrainOperation*);
 
     void updateActiveList();
-
-    bool repopulating;
-
-private slots:
-
-    void onPropertyChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
-
     void addOperation();
     void removeOperation();
     void moveOpUp();
@@ -61,14 +47,14 @@ private slots:
     void exportTerrain();
 
 public:
-    explicit TerrainModule(Ui::Application* ui, QObject *parent = 0);
+    explicit TerrainModule(MainWindow* mainWindow);
     ~TerrainModule();
 
     // terrain generatot progress interface
     void nextOperation(int index);
     void setPercent(float);
 
-    void viewportInit(Viewport3D*){}
+    void viewportInit(Viewport3D*) {}
     void viewportDraw(Viewport3D*);
 };
 

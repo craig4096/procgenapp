@@ -1,60 +1,63 @@
 #include "ProcTexturingModule.h"
-#include "ui_application.h"
 #include <cstdio>
 #include <stdexcept>
-#include <QFileDialog>
-#include <QTextStream>
+#include <wx/filedlg.h>
 #include <iostream>
-#include <QMessageBox>
+#include <wx/msgdlg.h>
 using namespace std;
 
-ProcTexturingModule::ProcTexturingModule(Ui::Application* ui, QObject *parent)
-  : QObject(parent)
-  , ui(ui)
-  , shaderInvalid(true)
-  , shader(nullptr)
-  , time(0.0f)
-  , mesh(nullptr)
+ProcTexturingModule::ProcTexturingModule(MainWindow* mainWindow)
+    : mainWindow(mainWindow)
+    , shaderInvalid(true)
+    , shader(nullptr)
+    , time(0.0f)
+    , mesh(nullptr)
 {
-    viewport = new Viewport3D("skybox", 0.01f, 5, 0.005f);
+    viewport = new Viewport3D(mainWindow->proctex_viewport, this, "skybox", 0.01f, 5, 0.005f);
 
-    viewport->setRenderer(this);
-    ui->proctex_viewport->addWidget(viewport);
+    mainWindow->proctex_viewport_sizer->Add(viewport, 1, wxEXPAND);
 
-    connect(ui->proctex_sac, SIGNAL(clicked()), this, SLOT(saveAndCompile()));
-    connect(ui->proctex_new, SIGNAL(clicked()), this, SLOT(newShader()));
-    connect(ui->proctex_load, SIGNAL(clicked()), this, SLOT(loadShader()));
+    mainWindow->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event) { saveAndCompile(); }, MainWindow::ID_ProcTex_SaveAndCompile);
+    mainWindow->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event) { newShader(); }, MainWindow::ID_ProcTex_New);
+    mainWindow->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event) { loadShader(); }, MainWindow::ID_ProcTex_Load);
 }
 
-ProcTexturingModule::~ProcTexturingModule() {
+ProcTexturingModule::~ProcTexturingModule()
+{
     delete shader;
     delete mesh;
 }
 
-void ProcTexturingModule::viewportInit(Viewport3D*) {
+void ProcTexturingModule::viewportInit(Viewport3D*)
+{
     mesh = new Mesh("meshes/proctex_mesh.txt");
-
 
     glEnable(GL_BLEND);
     //glBlendFunc(GL_ONE, GL_ONE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void ProcTexturingModule::viewportDraw(Viewport3D*) {
-    if(shaderInvalid && activeFragShaderFilename != "") {
+void ProcTexturingModule::viewportDraw(Viewport3D*)
+{
+    if (shaderInvalid && activeFragShaderFilename != "")
+    {
         // try to load new shader
-        try {
+        try
+        {
             Shader* tmp = new Shader("shaders/std_vertex.glslv", activeFragShaderFilename); // FIXME: if exception is thrown does this get deallocated?
             shaderInvalid = false;
             // delete previous shader and assign new
             delete shader;
             shader = tmp;
-            ui->proctext_errors->setText("");
-        } catch(std::exception& e) {
-            ui->proctext_errors->setText(QString::fromStdString(e.what()));
+            mainWindow->proctext_errors->SetValue("");
+        }
+        catch (std::exception& e)
+        {
+            mainWindow->proctext_errors->SetValue(wxString(e.what()));
         }
     }
-    if(shader != NULL) {
+    if (shader != nullptr)
+    {
         time += 0.033f;
         shader->Set();
         glUniform1f(glGetUniformLocation(shader->GetProgram(), "time"), time);
@@ -64,54 +67,65 @@ void ProcTexturingModule::viewportDraw(Viewport3D*) {
     Shader::Unset();
 }
 
-void ProcTexturingModule::saveAndCompile() {
+void ProcTexturingModule::saveAndCompile()
+{
     // save the edited fragment shader
-    if(activeFragShaderFilename.empty()) {
+    if (activeFragShaderFilename.empty())
+    {
         // choose file location
-        activeFragShaderFilename = QFileDialog::getSaveFileName(0, "Choose fragment shader file location").toStdString();
+        wxFileDialog saveFileDialog(mainWindow, "Choose fragment shader file location", "", "", "All files (*.*)|*.*", wxFD_SAVE | wxFD_FILE_MUST_EXIST);
+        if (saveFileDialog.ShowModal() == wxID_OK)
+        {
+            activeFragShaderFilename = saveFileDialog.GetPath().ToStdString();
+        }
     }
 
-    if(activeFragShaderFilename == "") {
+    if (activeFragShaderFilename.empty())
+    {
         return;
     }
 
     // save file
-    QFile file(QString::fromStdString(activeFragShaderFilename));
-    if(!file.open(QIODevice::WriteOnly)) {
-        // error msg
-    } else {
-        QTextStream out(&file);
-        out << ui->proctex_fragedit->toPlainText();
-        out.flush();
-        file.close();
+    std::ofstream ofs(activeFragShaderFilename.c_str());
+    if (ofs.good())
+    {
+        ofs << mainWindow->proctex_fragedit->GetValue();
+        ofs.flush();
+        ofs.close();
     }
     // invalidate the shader
     shaderInvalid = true;
-    viewport->update();
+    viewport->Refresh();
 }
 
-void ProcTexturingModule::loadShader() {
-    QString filename = QFileDialog::getOpenFileName(0, "Load Shader");
-    if(filename == "") {
-        return;
-    }
-    // load text from file into editor
-    QFile file(filename);
-    if(!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::critical(0, "Error", "Could not open file");
-        return;
-    }
-    QTextStream in(&file);
-    ui->proctex_fragedit->setText(in.readAll());
-    file.close();
+void ProcTexturingModule::loadShader()
+{
+    wxFileDialog openFileDialog(mainWindow, "Load Shader", "", "", "All files (*.*)|*.*", wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+    if (openFileDialog.ShowModal() == wxID_OK)
+    {
+        std::string filename = openFileDialog.GetPath().ToStdString();
 
-    // load the new shader
-    shaderInvalid = true;
-    activeFragShaderFilename = filename.toStdString();
+        // load text from file into editor
+        std::ifstream ifs(filename);
+        if (ifs.good())
+        {
+            std::string fileContents(std::istreambuf_iterator<char>{ifs}, {});
+
+            mainWindow->proctex_fragedit->SetValue(fileContents);
+
+            // load the new shader
+            shaderInvalid = true;
+            activeFragShaderFilename = filename;
+        }
+        else
+        {
+            wxMessageBox("Could not open file", "Error");
+        }
+    }
 }
 
-void ProcTexturingModule::newShader() {
-    //ui->proctex_fragedit->setText("\nvoid main() {\n\tgl_FragColor = vec4(1,1,1,1);\n}");
-    ui->proctex_fragedit->setText("");
+void ProcTexturingModule::newShader()
+{
+    mainWindow->proctex_fragedit->SetValue("");
     activeFragShaderFilename = "";
 }

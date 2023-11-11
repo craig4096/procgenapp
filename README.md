@@ -20,21 +20,19 @@ An application developed for research into various different procedural generati
 </table>
 
 ## Build instructions
-
-- Install the latest version of Qt creator
-
-- Install [vcpkg](https://vcpkg.io/en/) (preferably to the C:\vcpkg\ directory) and run the following command to install library dependencies:
+Install [vcpkg](https://vcpkg.io/en/) and run the following command to install library dependencies:
 
  ```
-vcpkg install glew
+vcpkg install wxwidgets opengl glew
  ```
 
-- Open the project file (.pro) in Qt creator
-- If vcpkg is installed somewhere other that C:\vcpkg\ then you will need to update the paths assigned to 'LIBS' and 'INCLUDEPATH' in the .pro file to point to the correct vcpkg installation directory
-- Build the project
-- Copy the glew32.dll file from your C:\vcpkg\installed\x64-windows\bin\ directory into the 'build\Bin' directory
-- Copy all the files in the 'Bin' directory (shaders, textures etc.) into the 'build\Bin' directory
-- You should now be able to run the application from Qt creator
+ Then cd into the project root folder and run the following cmake commands:
+ ```
+cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg_dir>\scripts\buildsystems\vcpkg.cmake
+cmake --build build --config Release
+ ```
+
+Replacing the <path_to_vcpkg_dir> with the path to your vcpkg installation folder. This will place the executable and resource files into the /build/Release/ folder. You can build the Debug build by specifying --config Debug instead.
 
 
 

@@ -10,19 +10,22 @@
 This class represents a basic shape grammar algorithm
 context-free, uses set grammars, Bounding box occlusion tests and some basic shape rules
 */
-class BasicShapeGrammar {
+class BasicShapeGrammar
+{
 public:
-
-    enum RHSFilterType {
+    enum RHSFilterType
+    {
         Default,
         RandSel,
         RandSelOne
     };
 
-    struct Rule {
+    struct Rule
+    {
         RHSFilterType filterType;
         std::string lhsSymbol;
-        struct RHS {
+        struct RHS
+        {
             bool isClass;   // determines whether the symbol member represents an actual shape or a class
             std::string symbol;
             vec3 translation;
@@ -47,7 +50,7 @@ private:
 
     // determines whether the rule can be applied to the specific shape or not
     bool isCandidateRule(const ShapeDatabase& shapes, const Shape& shape,
-                    const Rule& rule);
+        const Rule& rule);
 
 
     // given an array of rules this function will randomly select a rule based on its
@@ -55,7 +58,6 @@ private:
     static int selectRule(const Shape& shape, const std::vector<Rule>& candidateRules);
 
 public:
-
 
     BasicShapeGrammar(const std::string& rulesFile);
     ~BasicShapeGrammar();

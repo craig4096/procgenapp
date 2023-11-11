@@ -6,11 +6,11 @@ RenderableHeightmap::RenderableHeightmap(Heightmap* h)
     : Heightmap(*h)
     , renderDataCreated(false)
 {
-    this->vertexCount = GetWidth()*GetHeight();
+    this->vertexCount = GetWidth() * GetHeight();
     //this->texcoords = new vec2[vertexCount];
     this->vertices = new vec3[vertexCount];
     this->normals = new vec3[vertexCount];
-    this->indexCount = (GetWidth()-1)*(GetHeight()-1)*6;
+    this->indexCount = (GetWidth() - 1) * (GetHeight() - 1) * 6;
     this->indices = new int[indexCount];
 
     CalculateVertices();
@@ -18,7 +18,8 @@ RenderableHeightmap::RenderableHeightmap(Heightmap* h)
     CalculateIndices();
 }
 
-RenderableHeightmap::~RenderableHeightmap() {
+RenderableHeightmap::~RenderableHeightmap()
+{
     delete[] vertices;
     //delete[] texcoords;
     delete[] normals;
@@ -30,16 +31,19 @@ RenderableHeightmap::~RenderableHeightmap() {
     glDeleteBuffers(1, &indexBuffer);
 }
 
-void RenderableHeightmap::CalculateVertices() {
-    float startX = (GetWidth()/2.0f) * -scaleX;
-    float startZ = (GetHeight()/2.0f) * -scaleZ;
+void RenderableHeightmap::CalculateVertices()
+{
+    float startX = (GetWidth() / 2.0f) * -scaleX;
+    float startZ = (GetHeight() / 2.0f) * -scaleZ;
     int index = 0;
 
     // generate an array of vertices
     float zr = startZ;
-    for(int z = 0; z < GetHeight(); ++z) {
+    for (int z = 0; z < GetHeight(); ++z)
+    {
         float xr = startX;
-        for(int x = 0; x < GetWidth(); ++x) {
+        for (int x = 0; x < GetWidth(); ++x)
+        {
             vertices[index].x = xr;
             vertices[index].y = GetValue(x, z) * scaleY;
             vertices[index].z = zr;
@@ -50,11 +54,12 @@ void RenderableHeightmap::CalculateVertices() {
     }
 }
 
-void RenderableHeightmap::CalculateNormals() {
+void RenderableHeightmap::CalculateNormals()
+{
     // calculate normals...
     // loop all triangles and add tri normals to normals array
-    for(int z = 0; z < GetHeight(); ++z) {
-        for(int x = 0; x < GetWidth(); ++x) {
+    for (int z = 0; z < GetHeight(); ++z) {
+        for (int x = 0; x < GetWidth(); ++x) {
             /*
             int a = GetIndex(x, z);
             int b = GetIndex(x, z+1);
@@ -76,7 +81,8 @@ void RenderableHeightmap::CalculateNormals() {
         }
     }
     // normalize normals and upload to gpu
-    for(int i = 0; i < GetSize(); ++i) {
+    for (int i = 0; i < GetSize(); ++i)
+    {
         //normals[i].normalize();
     }
 }
@@ -85,15 +91,15 @@ void RenderableHeightmap::CalculateIndices()
 {
     // now generate indices
     int index = 0;
-    for(int z = 0; z < GetHeight()-1; ++z) {
-        for(int x = 0; x < GetWidth()-1; ++x) {
+    for (int z = 0; z < GetHeight() - 1; ++z) {
+        for (int x = 0; x < GetWidth() - 1; ++x) {
             indices[index++] = GetIndex(x, z);
-            indices[index++] = GetIndex(x, z+1);
-            indices[index++] = GetIndex(x+1, z+1);
+            indices[index++] = GetIndex(x, z + 1);
+            indices[index++] = GetIndex(x + 1, z + 1);
 
             indices[index++] = GetIndex(x, z);
-            indices[index++] = GetIndex(x+1, z+1);
-            indices[index++] = GetIndex(x+1, z);
+            indices[index++] = GetIndex(x + 1, z + 1);
+            indices[index++] = GetIndex(x + 1, z);
         }
     }
 }
@@ -115,20 +121,22 @@ void RenderableHeightmap::CalculateTextureCoords() {
 }
 */
 
-void RenderableHeightmap::CreateRenderData() {
-    if(renderDataCreated) {
+void RenderableHeightmap::CreateRenderData()
+{
+    if (renderDataCreated)
+    {
         return;
     }
 
     glGenBuffers(1, &vertexBuffer);
     //cout << "Vertex Buffer: " << vertexBuffer << endl;
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount*sizeof(vec3), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(vec3), vertices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &normalBuffer);
     //cout << "Normal Buffer: " << normalBuffer << endl;
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount*sizeof(vec3), normals, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(vec3), normals, GL_STATIC_DRAW);
 
     //glGenBuffersARB(1, &texcoordsBuffer);
    // glBindBufferARB(GL_ARRAY_BUFFER, texcoordsBuffer);
@@ -137,7 +145,7 @@ void RenderableHeightmap::CreateRenderData() {
     glGenBuffers(1, &indexBuffer);
     //cout << "Index Buffer: " << indexBuffer << endl;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount*sizeof(int), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(int), indices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -145,7 +153,8 @@ void RenderableHeightmap::CreateRenderData() {
     renderDataCreated = true;
 }
 
-void RenderableHeightmap::Draw() {
+void RenderableHeightmap::Draw()
+{
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glShadeModel(GL_SMOOTH);
@@ -180,10 +189,10 @@ void RenderableHeightmap::Draw() {
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
     glNormalPointer(GL_FLOAT, 0, 0);
 
-   // glBindBufferARB(GL_ARRAY_BUFFER, texcoordsBuffer);
-   // glTexCoordPointer(2, GL_FLOAT, 0, 0);
+    // glBindBufferARB(GL_ARRAY_BUFFER, texcoordsBuffer);
+    // glTexCoordPointer(2, GL_FLOAT, 0, 0);
 
-   // cout << "Binding indices buffer" << endl;
+    // cout << "Binding indices buffer" << endl;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     //cout << "drawing elements: indexBuffer: " << indexBuffer << " indexCount: " << indexCount << endl;
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
@@ -193,7 +202,7 @@ void RenderableHeightmap::Draw() {
     glDisableClientState(GL_NORMAL_ARRAY);
     //glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    glColor3f(1,1,1);
+    glColor3f(1, 1, 1);
     glDisable(GL_LIGHTING);
     glDisable(GL_LIGHT0);
 }

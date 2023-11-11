@@ -1,0 +1,333 @@
+<?xml version="1.0"?>
+<wxUiEditorData
+  data_version="16">
+  <node
+    class="Project"
+    code_preference="XRC">
+    <node
+      class="wxFrame"
+      class_name="MainWindow"
+      title="Procedural Generation App"
+      base_file="mainwindow">
+      <node
+        class="wxStatusBar" />
+      <node
+        class="wxNotebook"
+        class_access="public:"
+        var_name="simplebook">
+        <node
+          class="BookPage"
+          label="Terrain"
+          var_name="terrain_page"
+          background_colour="wxSYS_COLOUR_BTNFACE"
+          window_style="wxTAB_TRAVERSAL">
+          <node
+            class="wxBoxSizer"
+            var_name="terrain_page_sizer"
+            flags="wxEXPAND">
+            <node
+              class="wxPanel"
+              var_name="terrain_left_panel"
+              minimum_size="-1,-1d"
+              window_style="wxTAB_TRAVERSAL"
+              flags="wxEXPAND"
+              proportion="1">
+              <node
+                class="wxBoxSizer"
+                orientation="wxVERTICAL"
+                var_name="terrain_left_panel_sizer"
+                flags="wxEXPAND">
+                <node
+                  class="wxPropertyGrid"
+                  class_access="public:"
+                  var_name="propertyGrid"
+                  flags="wxEXPAND"
+                  proportion="1" />
+                <node
+                  class="wxBoxSizer"
+                  var_name="box_sizer_2"
+                  minimum_size="-1,-1d"
+                  border_size="0"
+                  borders=""
+                  flags="wxEXPAND"
+                  proportion="1">
+                  <node
+                    class="wxPanel"
+                    window_style="wxTAB_TRAVERSAL"
+                    border_size="0"
+                    flags="wxEXPAND"
+                    proportion="1">
+                    <node
+                      class="wxBoxSizer"
+                      orientation="wxVERTICAL"
+                      var_name="box_sizer_3"
+                      borders=""
+                      flags="wxEXPAND"
+                      proportion="1">
+                      <node
+                        class="wxListBox"
+                        class_access="public:"
+                        var_name="terrain_oplist"
+                        minimum_size="-1,-1d"
+                        flags="wxEXPAND"
+                        proportion="1" />
+                      <node
+                        class="wxButton"
+                        label="Add"
+                        var_name="terrain_add_op"
+                        id="ID_Terrain_Add"
+                        flags="wxEXPAND" />
+                      <node
+                        class="wxButton"
+                        label="Remove"
+                        var_name="terrain_remove_op"
+                        id="ID_Terrain_Remove"
+                        flags="wxEXPAND" />
+                      <node
+                        class="wxButton"
+                        label="Generate terrain"
+                        var_name="terrain_generate"
+                        id="ID_Terrain_Generate"
+                        flags="wxEXPAND" />
+                    </node>
+                  </node>
+                  <node
+                    class="wxPanel"
+                    var_name="panel_2"
+                    window_style="wxTAB_TRAVERSAL"
+                    border_size="0"
+                    flags="wxEXPAND"
+                    proportion="1">
+                    <node
+                      class="wxBoxSizer"
+                      orientation="wxVERTICAL"
+                      var_name="box_sizer_4"
+                      borders=""
+                      flags="wxEXPAND"
+                      proportion="1">
+                      <node
+                        class="wxListBox"
+                        class_access="public:"
+                        var_name="terrain_active_oplist"
+                        id="ID_Terrain_ActiveOpList"
+                        minimum_size="-1,-1d"
+                        flags="wxEXPAND"
+                        proportion="1" />
+                      <node
+                        class="wxButton"
+                        label="Up"
+                        var_name="terrain_up"
+                        id="ID_Terrain_MoveUp"
+                        flags="wxEXPAND" />
+                      <node
+                        class="wxButton"
+                        label="Down"
+                        var_name="terrain_down"
+                        id="ID_Terrain_MoveDown"
+                        flags="wxEXPAND" />
+                      <node
+                        class="wxButton"
+                        label="Export"
+                        var_name="terrain_export"
+                        id="ID_Terrain_Export"
+                        flags="wxEXPAND" />
+                    </node>
+                  </node>
+                </node>
+                <node
+                  class="wxGauge"
+                  class_access="public:"
+                  var_name="terrain_progress"
+                  flags="wxEXPAND" />
+              </node>
+            </node>
+            <node
+              class="wxPanel"
+              class_access="public:"
+              var_name="terrain_viewport"
+              minimum_size="-1,-1d"
+              window_style="wxTAB_TRAVERSAL"
+              flags="wxEXPAND"
+              proportion="2">
+              <node
+                class="wxBoxSizer"
+                class_access="public:"
+                orientation="wxVERTICAL"
+                var_name="terrain_viewport_sizer"
+                flags="wxEXPAND" />
+            </node>
+          </node>
+        </node>
+        <node
+          class="BookPage"
+          label="Structural"
+          var_name="bsg_page"
+          background_colour="wxSYS_COLOUR_BTNFACE"
+          window_style="wxTAB_TRAVERSAL">
+          <node
+            class="wxBoxSizer"
+            var_name="bsg_page_sizer">
+            <node
+              class="wxBoxSizer"
+              orientation="wxVERTICAL"
+              var_name="bsg_text_panel_sizer"
+              flags="wxEXPAND"
+              proportion="1">
+              <node
+                class="wxTextCtrl"
+                class_access="public:"
+                style="wxTE_MULTILINE"
+                var_name="bsg_textCtrl"
+                minimum_size="-1,-1d"
+                flags="wxEXPAND"
+                proportion="1" />
+              <node
+                class="wxBoxSizer"
+                flags="wxEXPAND">
+                <node
+                  class="wxButton"
+                  label="Load"
+                  var_name="bsg_load"
+                  id="ID_BSG_Load"
+                  proportion="1" />
+                <node
+                  class="wxButton"
+                  label="Save"
+                  var_name="bsg_save"
+                  id="ID_BSG_Save"
+                  proportion="1" />
+                <node
+                  class="wxButton"
+                  label="Clear"
+                  var_name="bsg_clear"
+                  id="ID_BSG_Clear"
+                  proportion="1" />
+                <node
+                  class="wxButton"
+                  label="Apply"
+                  var_name="bsg_apply"
+                  id="ID_BSG_Apply"
+                  proportion="1" />
+                <node
+                  class="wxSpinCtrl"
+                  class_access="public:"
+                  var_name="bsg_num_iterations"
+                  id="ID_BSG_Iterations"
+                  proportion="1" />
+              </node>
+            </node>
+            <node
+              class="wxPanel"
+              class_access="public:"
+              var_name="bsg_view_panel"
+              minimum_size="-1,-1d"
+              window_style="wxTAB_TRAVERSAL"
+              flags="wxEXPAND"
+              proportion="1">
+              <node
+                class="wxBoxSizer"
+                class_access="public:"
+                orientation="wxVERTICAL"
+                var_name="bsg_view_panel_sizer" />
+            </node>
+          </node>
+        </node>
+        <node
+          class="BookPage"
+          label="Texturing"
+          var_name="texturing_page"
+          background_colour="wxSYS_COLOUR_BTNFACE"
+          window_style="wxTAB_TRAVERSAL">
+          <node
+            class="wxBoxSizer"
+            var_name="texturing_page_sizer"
+            flags="wxEXPAND">
+            <node
+              class="wxBoxSizer"
+              orientation="wxVERTICAL"
+              var_name="box_sizer_6"
+              flags="wxEXPAND"
+              proportion="1">
+              <node
+                class="wxTextCtrl"
+                class_access="public:"
+                style="wxTE_MULTILINE"
+                var_name="proctex_fragedit"
+                flags="wxEXPAND"
+                proportion="3" />
+              <node
+                class="wxTextCtrl"
+                class_access="public:"
+                style="wxTE_MULTILINE"
+                var_name="proctext_errors"
+                flags="wxEXPAND"
+                proportion="1" />
+              <node
+                class="wxBoxSizer"
+                var_name="box_sizer_7"
+                flags="wxEXPAND">
+                <node
+                  class="wxButton"
+                  label="Save and Compile"
+                  var_name="proctex_sac"
+                  id="ID_ProcTex_SaveAndCompile"
+                  proportion="1" />
+                <node
+                  class="wxButton"
+                  label="Load"
+                  var_name="proctex_load"
+                  id="ID_ProcTex_Load"
+                  proportion="1" />
+                <node
+                  class="wxButton"
+                  label="New"
+                  var_name="proctex_new"
+                  id="ID_ProcTex_New"
+                  proportion="1" />
+              </node>
+            </node>
+            <node
+              class="wxPanel"
+              class_access="public:"
+              var_name="proctex_viewport"
+              window_style="wxTAB_TRAVERSAL"
+              flags="wxEXPAND"
+              proportion="1">
+              <node
+                class="wxBoxSizer"
+                class_access="public:"
+                orientation="wxVERTICAL"
+                var_name="proctex_viewport_sizer" />
+            </node>
+          </node>
+        </node>
+        <node
+          class="BookPage"
+          label="Game Demo"
+          var_name="game_page"
+          background_colour="wxSYS_COLOUR_BTNFACE"
+          window_style="wxTAB_TRAVERSAL"
+          flags="wxEXPAND">
+          <node
+            class="wxBoxSizer"
+            var_name="box_sizer_5">
+            <node
+              class="wxPanel"
+              class_access="public:"
+              var_name="game_viewport"
+              background_colour=""
+              window_style="wxTAB_TRAVERSAL"
+              flags="wxEXPAND"
+              proportion="1">
+              <node
+                class="wxBoxSizer"
+                class_access="public:"
+                orientation="wxVERTICAL"
+                var_name="game_viewport_sizer" />
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+  </node>
+</wxUiEditorData>

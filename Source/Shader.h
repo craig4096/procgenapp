@@ -3,7 +3,8 @@
 #include <string>
 #include "GL/glew.h"
 
-class Shader {
+class Shader
+{
     GLuint vertexShader, fragmentShader;
     GLuint program;
     void load(const std::string& vertexfile, const std::string& fragfile);

@@ -6,15 +6,18 @@
 #include <fstream>
 using namespace std;
 
-Shader::Shader(const string& filename) {
-    load(filename+".glslv", filename+".glslf");
+Shader::Shader(const string& filename)
+{
+    load(filename + ".glslv", filename + ".glslf");
 }
 
-Shader::Shader(const string& vertexfile, const string& fragfile) {
+Shader::Shader(const string& vertexfile, const string& fragfile)
+{
     load(vertexfile, fragfile);
 }
 
-void Shader::load(const string& vertexfile, const string& fragfile) {
+void Shader::load(const string& vertexfile, const string& fragfile)
+{
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
     FILE* file;
@@ -22,7 +25,8 @@ void Shader::load(const string& vertexfile, const string& fragfile) {
 
     // load shader from file
     file = fopen(vertexfile.c_str(), "rb");
-    if(!file) {
+    if (!file)
+    {
         throw logic_error("could not open vertex shader file");
     }
 
@@ -52,7 +56,8 @@ void Shader::load(const string& vertexfile, const string& fragfile) {
 
     // make sure it compiled
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &compileError);
-    if(compileError == GL_FALSE) {
+    if (compileError == GL_FALSE)
+    {
         // get the error
         glGetShaderInfoLog(vertexShader, 2048, &length, errormsg);
 
@@ -64,7 +69,8 @@ void Shader::load(const string& vertexfile, const string& fragfile) {
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
     file = fopen(fragfile.c_str(), "rb");
-    if(!file) {
+    if (!file)
+    {
         throw logic_error("could not open fragment shader file");
     }
 
@@ -85,10 +91,10 @@ void Shader::load(const string& vertexfile, const string& fragfile) {
     buffer.clear();
     fclose(file);
 
-
     // make sure it compiled
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &compileError);
-    if(compileError == GL_FALSE) {
+    if (compileError == GL_FALSE)
+    {
         // get the error
         glGetShaderInfoLog(fragmentShader, 2048, &length, errormsg);
 
@@ -107,13 +113,14 @@ void Shader::load(const string& vertexfile, const string& fragfile) {
 
     GLint status;
     glGetProgramiv(program, GL_LINK_STATUS, &status);
-    if(status == GL_FALSE) {
+    if (status == GL_FALSE)
+    {
         throw logic_error("could not link shaders");
     }
 }
 
-
-Shader::~Shader() {
+Shader::~Shader()
+{
     // first detach the shaders
     glDetachShader(program, vertexShader);
     glDetachShader(program, fragmentShader);
@@ -126,12 +133,13 @@ Shader::~Shader() {
     glDeleteProgram(program);
 }
 
-
-void Shader::Set() {
+void Shader::Set()
+{
     glUseProgram(this->program);
 }
 
-void Shader::Unset() {
+void Shader::Unset()
+{
     glUseProgram(0);
 }
 
@@ -141,7 +149,7 @@ std::string Shader::processIncludes(const std::string& shaderFile)
     std::istringstream iss(shaderFile);
 
     std::string line;
-    while(std::getline(iss, line))
+    while (std::getline(iss, line))
     {
         if (line.find("#include") != std::string::npos)
         {

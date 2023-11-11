@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <fstream>
 // need to include this for reseting and querying mouse position
-#include <QCursor>
+#include <wx/window.h>
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
@@ -18,7 +18,7 @@
 using namespace std;
 
 GameDemo::GameDemo()
-    : heightmap(NULL)
+    : heightmap(nullptr)
     , levelGenerated(false)
     , waterLevel(50.0f)
     , time(0.0f)
@@ -35,13 +35,15 @@ GameDemo::GameDemo()
 {
 }
 
-GameDemo::~GameDemo() {
+GameDemo::~GameDemo()
+{
     delete skybox;
     delete dungeonEntranceMesh;
 }
 
 
-void GameDemo::initGL() {
+void GameDemo::initGL()
+{
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -73,7 +75,8 @@ void GameDemo::initGL() {
 }
 
 
-void GameDemo::generateLevel(int seed) {
+void GameDemo::generateLevel(int seed)
+{
     levelSeed = seed;
     delete heightmap;
 
@@ -97,21 +100,11 @@ void GameDemo::generateLevel(int seed) {
     tergen.addOperation(&te);
 
     Heightmap* h = tergen.generateTerrain(NULL);
-/*
-            // clear a random selection of the terrain to a certain height
-    int left = 230, right=280, bottom=230, top = 280;
-
-    for(int x = left; x < right; ++x) {
-        for(int y = bottom; y < top; ++y) {
-            h->SetValue(x, y, 0.75f);
-        }
-    }
-    */
 
     heightmap = new RenderableHeightmap(h);
 
     srand(seed);
-    waterLevel = randomf()*40+20;
+    waterLevel = randomf() * 40 + 20;
 
     delete h;
 
@@ -119,18 +112,20 @@ void GameDemo::generateLevel(int seed) {
     srand(seed);
     // random generate a number of dungeon entrances
     dungeonEntrances.clear();
-    for(int numAttempts = 0; numAttempts < 5; ++numAttempts) {
+    for (int numAttempts = 0; numAttempts < 5; ++numAttempts)
+    {
         // randomly select a point on the terrain
         vec3 pos;
-        float w = heightmap->GetWidth()*heightmap->GetScaleX();
-        float h = heightmap->GetHeight()*heightmap->GetScaleZ();
+        float w = heightmap->GetWidth() * heightmap->GetScaleX();
+        float h = heightmap->GetHeight() * heightmap->GetScaleZ();
 
-        pos.x = (randomf() * w) - (w/2);
-        pos.z = (randomf() * h) - (h/2);
+        pos.x = (randomf() * w) - (w / 2);
+        pos.z = (randomf() * h) - (h / 2);
 
         pos.y = heightmap->GetWorldHeight(pos.x, pos.z);
         // if the placement point is above sea level then add the entrance
-        if(pos.y > waterLevel) {
+        if (pos.y > waterLevel)
+        {
             DungeonEntrance e;
             e.position = pos;
             e.seed = rand();
@@ -143,157 +138,189 @@ void GameDemo::generateLevel(int seed) {
 }
 
 
-void GameDemo::setShader(Shader* shader) {
+void GameDemo::setShader(Shader* shader)
+{
     shader->Set();
     glUniform1f(glGetUniformLocation(shader->GetProgram(), "time"), time);
     // set the view matrix unform
     glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "viewMat"), 1, GL_FALSE, (GLfloat*)&viewMat);
 }
 
-void GameDemo::unsetShader(Shader*) {
+void GameDemo::unsetShader(Shader*)
+{
     Shader::Unset();
 }
 
-vec3 calculateViewDir(float xRot, float yRot) {
+vec3 calculateViewDir(float xRot, float yRot)
+{
     vec3 target;
     // x and z can be calculated from the y axis
     // rotation using sin and cos
-    target.x = sin(yRot * M_PI/180.0f);
-    target.z = cos(yRot * M_PI/180.0f);
+    target.x = sin(yRot * M_PI / 180.0f);
+    target.z = cos(yRot * M_PI / 180.0f);
 
     // y can be calculated from the
     // x rotation using cos
-    target.y = cos(xRot * M_PI/180.0f);
+    target.y = cos(xRot * M_PI / 180.0f);
 
-    if(target.y > 0.0f)
+    if (target.y > 0.0f)
     {
-        target.x *= (1.0f-target.y);
-        target.z *= (1.0f-target.y);
+        target.x *= (1.0f - target.y);
+        target.z *= (1.0f - target.y);
     }
     else
     {
-        target.x *= (1.0f+target.y);
-        target.z *= (1.0f+target.y);
+        target.x *= (1.0f + target.y);
+        target.z *= (1.0f + target.y);
     }
 
     return target;
 }
 
-void GameDemo::mousePressed() {
-    QPoint p = QCursor::pos();
-    resetX = p.x();
-    resetY = p.y();
+void GameDemo::mousePressed()
+{
+    wxPoint p = wxGetMousePosition();
+    resetX = p.x;
+    resetY = p.y;
     mousePressing = true;
 }
 
-void GameDemo::mouseReleased() {
+void GameDemo::mouseReleased()
+{
     mousePressing = false;
     //rleft=rright=rforward=rbackward=false;
 }
 
-void GameDemo::update(float timeStep) {
+void GameDemo::mouseEnter()
+{
+}
+
+void GameDemo::mouseExit()
+{
+    mousePressing = false;
+}
+
+void GameDemo::update(float timeStep)
+{
     time += timeStep;
 
-    float speed = 8.0f;
+    float speed = 16.0f;
 
     vec3 newPos = playerPos;
     float ytrans = (flyMode) ? viewDirection.y : 0.0f;
 
-    if(forward) {
-        newPos += vec3(viewDirection.x, ytrans, viewDirection.z)*speed*timeStep;
+    if (forward)
+    {
+        newPos += vec3(viewDirection.x, ytrans, viewDirection.z) * speed * timeStep;
     }
-    if(backward) {
-        newPos -= vec3(viewDirection.x, ytrans, viewDirection.z)*speed*timeStep;
+    if (backward)
+    {
+        newPos -= vec3(viewDirection.x, ytrans, viewDirection.z) * speed * timeStep;
     }
-    if(left) {
-        newPos -= vec3(rightVec.x, ytrans, rightVec.z)*speed*timeStep;
+    if (left)
+    {
+        newPos -= vec3(rightVec.x, ytrans, rightVec.z) * speed * timeStep;
     }
-    if(right) {
-        newPos += vec3(rightVec.x, ytrans, rightVec.z)*speed*timeStep;
+    if (right)
+    {
+        newPos += vec3(rightVec.x, ytrans, rightVec.z) * speed * timeStep;
     }
 
     static const float rspeed = 45.0f;
-    if(rforward) {
+    if (rforward)
+    {
         rotationX -= rspeed * timeStep;
     }
-    if(rbackward) {
+    if (rbackward)
+    {
         rotationX += rspeed * timeStep;
     }
-    if(rleft) {
+    if (rleft)
+    {
         rotationY += rspeed * timeStep;
     }
-    if(rright) {
+    if (rright)
+    {
         rotationY -= rspeed * timeStep;
     }
     // clamp x rotation somewhere
     // between 0 and 180
-    if(rotationX < 1.0f) {
+    if (rotationX < 1.0f)
+    {
         rotationX = 1.0f;
     }
-    if(rotationX > 179.0f) {
+    if (rotationX > 179.0f)
+    {
         rotationX = 179.0f;
     }
 
-    if(rotationY >= 360.0f) {
+    if (rotationY >= 360.0f)
+    {
         rotationY -= 360.0f;
     }
-    if(rotationY < 0.0f) {
+    if (rotationY < 0.0f)
+    {
         rotationY += 360.0f;
     }
 
     // only update the camera if the user is clicking the mouse
-    if(mousePressing) {
+    if (mousePressing)
+    {
+        // get the cursor position
+        wxPoint p = wxGetMousePosition();
+        // calculate the delta between the point and the screen
+        // center...
+        int dx = resetX - p.x;
+        int dy = p.y - resetY;
 
-    // get the cursor position
-     QPoint p = QCursor::pos();
-    // calculate the delta between the point and the screen
-    // center...
-    int dx = resetX - p.x();
-    int dy = p.y() - resetY;
+        // rotate the camera around the y axis based
+        // on how much the player moved the mouse left
+        // or right
+        rotationY += ((float)dx * 0.1);
+        if (rotationY >= 360.0f)
+            rotationY -= 360.0f;
+        if (rotationY < 0.0f)
+            rotationY += 360.0f;
 
-    // rotate the camera around the y axis based
-    // on how much the player moved the mouse left
-    // or right
-    rotationY += ((float)dx * 0.1);
-    if(rotationY >= 360.0f)
-        rotationY -= 360.0f;
-    if(rotationY < 0.0f)
-        rotationY += 360.0f;
+        // rotate the camera around the x axis
+        // based on how much the player moved the
+        // mouse up or down
+        rotationX += ((float)dy * 0.1);
 
-    // rotate the camera around the x axis
-    // based on how much the player moved the
-    // mouse up or down
-    rotationX += ((float)dy * 0.1);
+        // clamp x rotation somewhere
+        // between 0 and 180
+        if (rotationX < 1.0f)
+        {
+            rotationX = 1.0f;
+        }
+        if (rotationX > 179.0f)
+        {
+            rotationX = 179.0f;
+        }
 
-    // clamp x rotation somewhere
-    // between 0 and 180
-    if(rotationX < 1.0f) {
-        rotationX = 1.0f;
-    }
-    if(rotationX > 179.0f) {
-        rotationX = 179.0f;
-    }
-    // set the cursor position back to the center
-    QCursor::setPos(resetX, resetY);
-
+        resetX = p.x;
+        resetY = p.y;
     }
 
     // calculate the new view direction
     viewDirection = calculateViewDir(rotationX, rotationY);
-    rightVec = viewDirection.crossProduct(vec3(0,1,0));
+    rightVec = viewDirection.crossProduct(vec3(0, 1, 0));
     rightVec.normalize();
 
-    if(isInDungeon) {
+    if (isInDungeon)
+    {
         // dungeon collision etc.  here
         playerPos = newPos;
         //playerPos.y = 30.0f;
         dungeonExitTimer -= timeStep;
-        if(dungeonExitTimer < 0.0f) {
+        if (dungeonExitTimer < 0.0f)
+        {
             dungeonExitTimer = 0.0f;
         }
 
         // check if the player is within range of the dungeon starting point(0,0,0)
-        if(dungeonExitTimer == 0.0f && playerPos.length() < 5.0f) {
+        if (dungeonExitTimer == 0.0f && playerPos.length() < 5.0f)
+        {
             // exit the dungeon
             isInDungeon = false;
             // set player position back to previous pos
@@ -303,7 +330,9 @@ void GameDemo::update(float timeStep) {
             // go back into dungeon
             dungeonEntrances[dungeonIndex].waitTime = 10.0f;
         }
-    } else {
+    }
+    else
+    {
         // player is outside
         if (flyMode)
         {
@@ -312,11 +341,12 @@ void GameDemo::update(float timeStep) {
         else
         {
             // process collision with terrain
-            if(heightmap != NULL) {
-                float height = heightmap->GetWorldHeight(newPos.x, newPos.z)+1;
+            if (heightmap != nullptr)
+            {
+                float height = heightmap->GetWorldHeight(newPos.x, newPos.z) + 1;
                 newPos.y = height;
                 // don't let players travel under water level
-                if(newPos.y > waterLevel+0.05f || true) {
+                if (newPos.y > waterLevel + 0.05f || true) {
                     playerPos = newPos;
                 }
             }
@@ -324,16 +354,19 @@ void GameDemo::update(float timeStep) {
 
         playerPos = newPos;
 
-        for(int i = 0; i < dungeonEntrances.size(); ++i) {
+        for (int i = 0; i < dungeonEntrances.size(); ++i)
+        {
             DungeonEntrance& de = dungeonEntrances[i];
 
             // update the dungeon wait time
             de.waitTime -= timeStep;
-            if(de.waitTime < 0.0f) {
+            if (de.waitTime < 0.0f)
+            {
                 de.waitTime = 0.0f;
             }
 
-            if((playerPos - de.position).length() < 5.0f && de.waitTime <= 0.0f) {
+            if ((playerPos - de.position).length() < 5.0f && de.waitTime <= 0.0f)
+            {
                 // load this dungeon
                 generateDungeon(de.seed);
                 // player is now in a dungeon
@@ -342,7 +375,7 @@ void GameDemo::update(float timeStep) {
                 playerExitPos = playerPos;
 
                 // set the players new position to the start position (i.e. zero)
-                playerPos = vec3(0,2,0);
+                playerPos = vec3(0, 2, 0);
 
                 dungeonIndex = i;
                 // set dungeon exit timer so player does immediately spawn outside
@@ -352,7 +385,8 @@ void GameDemo::update(float timeStep) {
     }
 }
 
-void GameDemo::generateDungeon(int seed) {
+void GameDemo::generateDungeon(int seed)
+{
     shapes.clear();
     // add axiom shape
     Shape shape;
@@ -363,11 +397,11 @@ void GameDemo::generateDungeon(int seed) {
     shape.calculateBoundingBox(shapes.getSymbolMeshMap());
     shapes.insert(shapes.begin(), shape);
     srand(seed);
-    int numIterations = (rand()%100) + 10;
+    int numIterations = (rand() % 100) + 10;
 
     static const int NUM_STAGES = 6;
     int num_iter[6] = {
-        numIterations/4,
+        numIterations / 4,
         1,
         numIterations,
         1,
@@ -375,33 +409,41 @@ void GameDemo::generateDungeon(int seed) {
         1
     };
 
-    for(int i = 1; i <= NUM_STAGES; ++i) {
+    for (int i = 1; i <= NUM_STAGES; ++i)
+    {
         std::stringstream ss;
         ss << "grammars/dungeon/stage" << i << ".txt";
         cout << ">>>>>>>>>>>>>>loading rule file: " << ss.str() << endl;
         BasicShapeGrammar grammar(ss.str());
-        grammar.generate(shapes, num_iter[i-1]);
+        grammar.generate(shapes, num_iter[i - 1]);
     }
 }
 
-void GameDemo::drawMesh(Mesh* mesh) {
+void GameDemo::drawMesh(Mesh* mesh)
+{
     // for all submeshes
-    for(int i = 0; i < mesh->getSubMeshCount(); ++i) {
+    for (int i = 0; i < mesh->getSubMeshCount(); ++i)
+    {
         SubMesh* m = mesh->getSubMesh(i);
         // find the associated shader
         ShadersMap::iterator it = shaders.find(m->getMaterialName());
-        if(it != shaders.end()) {
+        if (it != shaders.end())
+        {
             setShader(it->second);
             m->Draw();
-            unsetShader(NULL);
-        } else {
+            unsetShader(nullptr);
+        }
+        else
+        {
             m->Draw();
         }
     }
 }
 
-void GameDemo::drawDungeonEntrances() {
-    for(int i = 0; i < dungeonEntrances.size(); ++i) {
+void GameDemo::drawDungeonEntrances()
+{
+    for (int i = 0; i < dungeonEntrances.size(); ++i)
+    {
         const DungeonEntrance& e = dungeonEntrances[i];
         glPushMatrix();
         glTranslatef(e.position.x, e.position.y, e.position.z);
@@ -411,26 +453,29 @@ void GameDemo::drawDungeonEntrances() {
     }
 }
 
-void drawWaterGrid(int x, int y, float time) {
-    float startX = -(x/2.0f);
-    float startY = -(y/2.0f);
+void drawWaterGrid(int x, int y, float time)
+{
+    float startX = -(x / 2.0f);
+    float startY = -(y / 2.0f);
 
     glBegin(GL_QUADS);
-    for(int i = 0; i < x; ++i) {
-        for(int j = 0; j < y; ++j) {
+    for (int i = 0; i < x; ++i)
+    {
+        for (int j = 0; j < y; ++j)
+        {
             float xx = startX + i;
             float yy = startY + j;
 
-            float h1 = sin((i/(float)x) * 2*M_PI * 10 + (time*0.5));
-            float h2 = sin(((i+1)/(float)x) * 2*M_PI * 10 + (time*0.5));
+            float h1 = sin((i / (float)x) * 2 * M_PI * 10 + (time * 0.5));
+            float h2 = sin(((i + 1) / (float)x) * 2 * M_PI * 10 + (time * 0.5));
 
-            float hh1 = sin((j/(float)y) * 2*M_PI * 5 + (time*1.0));
-            float hh2 = sin(((j+1)/(float)y) * 2*M_PI * 5 + (time*1.0));
+            float hh1 = sin((j / (float)y) * 2 * M_PI * 5 + (time * 1.0));
+            float hh2 = sin(((j + 1) / (float)y) * 2 * M_PI * 5 + (time * 1.0));
 
 
-            glVertex3f(xx, h1 * hh2 * 4, yy+1);
-            glVertex3f(xx+1, h2 * hh2 * 4, yy+1);
-            glVertex3f(xx+1, h2 * hh1 * 4, yy);
+            glVertex3f(xx, h1 * hh2 * 4, yy + 1);
+            glVertex3f(xx + 1, h2 * hh2 * 4, yy + 1);
+            glVertex3f(xx + 1, h2 * hh1 * 4, yy);
             glVertex3f(xx, h1 * hh1 * 4, yy);
         }
     }
@@ -438,27 +483,34 @@ void drawWaterGrid(int x, int y, float time) {
 }
 
 
-void drawWaterBounds(float waterGridWorldSize) {
+void drawWaterBounds(float waterGridWorldSize)
+{
     // draw 8 quads surrounding the water grid
     glBegin(GL_QUADS);
-    for(int i = 0; i < 3; ++i) {
-        for(int j = 0; j < 3; ++j) {
-            if(i == 1 && j == 1) continue;
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            if (i == 1 && j == 1) continue;
             float x1 = (-1.5 + i) * waterGridWorldSize;
             float y1 = (-1.5 + j) * waterGridWorldSize;
             float x2 = x1 + waterGridWorldSize;
             float y2 = y1 + waterGridWorldSize;
 
-            if(x1 < -waterGridWorldSize) {
+            if (x1 < -waterGridWorldSize)
+            {
                 x1 = -10000.0f;
             }
-            if(x2 > waterGridWorldSize) {
+            if (x2 > waterGridWorldSize)
+            {
                 x2 = 10000.0f;
             }
-            if(y1 < -waterGridWorldSize) {
+            if (y1 < -waterGridWorldSize)
+            {
                 y1 = -10000.0f;
             }
-            if(y2 > waterGridWorldSize) {
+            if (y2 > waterGridWorldSize)
+            {
                 y2 = 10000.0f;
             }
 
@@ -471,9 +523,10 @@ void drawWaterBounds(float waterGridWorldSize) {
     glEnd();
 }
 
-void GameDemo::drawOutside() {
-
-    if(!levelGenerated) {
+void GameDemo::drawOutside()
+{
+    if (!levelGenerated)
+    {
         heightmap->CreateRenderData();
         levelGenerated = true;
     }
@@ -483,8 +536,9 @@ void GameDemo::drawOutside() {
     //static const float waterSize = 1000.0f;
 
     // first draw the scene (not inlcuding alpha-blended stuff (clouds)) to the depth buffer
-    glColorMask(0,0,0,0);
-    if(heightmap) {
+    glColorMask(0, 0, 0, 0);
+    if (heightmap)
+    {
         heightmap->Draw();
     }
 
@@ -493,24 +547,24 @@ void GameDemo::drawOutside() {
 
     //static const float waterGridWorldSize = gridSize * gridScale;
 
-
     glPushMatrix();
-    glTranslatef(0, waterLevel,0);
+    glTranslatef(0, waterLevel, 0);
     glScalef(gridScale, 1.0f, gridScale);
     drawWaterBounds(gridSize);
     drawWaterGrid(gridSize, gridSize, time);
     glPopMatrix();
     drawDungeonEntrances();
 
-    glColorMask(1,1,1,1);
+    glColorMask(1, 1, 1, 1);
 
 
     // now draw scene without depth test
     glDepthMask(GL_FALSE);
-    if(heightmap != NULL) {
+    if (heightmap != nullptr)
+    {
         setShader(shaders["terrain"]);
         heightmap->Draw();
-        unsetShader(NULL);
+        unsetShader(nullptr);
     }
 
     // get the water shader
@@ -520,7 +574,7 @@ void GameDemo::drawOutside() {
 
     // draw the water quad
     glPushMatrix();
-    glTranslatef(0, waterLevel,0);
+    glTranslatef(0, waterLevel, 0);
     glScalef(gridScale, 1.0f, gridScale);
     drawWaterBounds(gridSize);
     drawWaterGrid(gridSize, gridSize, time);
@@ -547,14 +601,15 @@ void GameDemo::drawOutside() {
     glPushMatrix();
     glTranslatef(playerPos.x, 0.0f, playerPos.z);
     // draw the clounds texture scolling over the top
-    for(int i = 0; i < cloudLayers; ++i) {
+    for (int i = 0; i < cloudLayers; ++i)
+    {
         // draw the water quad
         glBegin(GL_QUADS);
-            static const float size = 300.0f;
-            glVertex3f(-size, cloudLayerHeights[i], -size);
-            glVertex3f(size, cloudLayerHeights[i], -size);
-            glVertex3f(size, cloudLayerHeights[i], size);
-            glVertex3f(-size, cloudLayerHeights[i], size);
+        static const float size = 300.0f;
+        glVertex3f(-size, cloudLayerHeights[i], -size);
+        glVertex3f(size, cloudLayerHeights[i], -size);
+        glVertex3f(size, cloudLayerHeights[i], size);
+        glVertex3f(-size, cloudLayerHeights[i], size);
         glEnd();
     }
     glPopMatrix();
@@ -563,10 +618,12 @@ void GameDemo::drawOutside() {
     unsetShader(s);
 }
 
-void GameDemo::drawDungeon() {
-skybox->Draw(playerPos);
+void GameDemo::drawDungeon()
+{
+    skybox->Draw(playerPos);
     // draw the shapes in the shape database
-    for(ShapeDatabase::iterator i = shapes.begin(); i != shapes.end(); ++i) {
+    for (ShapeDatabase::iterator i = shapes.begin(); i != shapes.end(); ++i)
+    {
         const Shape& shape = (*i);
         glPushMatrix();
         glTranslatef(shape.position.x, shape.position.y, shape.position.z);
@@ -576,8 +633,8 @@ skybox->Draw(playerPos);
     }
 }
 
-void GameDemo::draw() {
-
+void GameDemo::draw()
+{
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     vec3 dst = playerPos + viewDirection;
@@ -586,16 +643,20 @@ void GameDemo::draw() {
     // save the view matrix
     glGetFloatv(GL_MODELVIEW_MATRIX, (float*)&viewMat);
 
-
-    if(isInDungeon) {
+    if (isInDungeon)
+    {
         drawDungeon();
-    } else {
+    }
+    else
+    {
         drawOutside();
     }
 }
 
-void GameDemo::move(int direction, bool moving) {
-    switch(direction) {
+void GameDemo::move(int direction, bool moving)
+{
+    switch (direction)
+    {
     case 0: forward = moving; break;
     case 1: backward = moving; break;
     case 2: left = moving; break;
@@ -603,8 +664,10 @@ void GameDemo::move(int direction, bool moving) {
     }
 }
 
-void GameDemo::rotate(int direction, bool rotating) {
-    switch(direction) {
+void GameDemo::rotate(int direction, bool rotating)
+{
+    switch (direction)
+    {
     case 0: rforward = rotating; break;
     case 1: rbackward = rotating; break;
     case 2: rleft = rotating; break;
@@ -612,17 +675,20 @@ void GameDemo::rotate(int direction, bool rotating) {
     }
 }
 
-
-void GameDemo::loadShadersMap(const std::string& filename) {
+void GameDemo::loadShadersMap(const std::string& filename)
+{
     std::ifstream ifs(filename.c_str());
-    if(!ifs.is_open()) {
+    if (!ifs.is_open())
+    {
         throw std::logic_error("could not open shaders file");
     }
 
-    while(!ifs.eof()) {
+    while (!ifs.eof())
+    {
         string shaderName, fileName;
         ifs >> shaderName >> fileName;
-        if(!shaderName.empty()) {
+        if (!shaderName.empty())
+        {
             shaders[shaderName] = new Shader("shaders/std_vertex.glslv", fileName);
         }
     }

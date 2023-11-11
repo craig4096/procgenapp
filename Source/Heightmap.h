@@ -2,7 +2,8 @@
 #include "math3d.h"
 #include "Array2D.h"
 
-class Heightmap : public Array2D<float> {
+class Heightmap : public Array2D<float>
+{
 protected:
     // the difference between a heightmap and a simple 2d array of floats
     // is that the heightmap has scale factors to determine it's size in the world

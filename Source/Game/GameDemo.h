@@ -10,7 +10,8 @@
 #include "../Structural/BasicShapeGrammar.h"
 #include "math3d.h"
 
-class GameDemo {
+class GameDemo
+{
     // the current level seed
     int levelSeed;
     // current water level
@@ -88,6 +89,8 @@ public:
 
     void mousePressed();
     void mouseReleased();
+    void mouseEnter();
+    void mouseExit();
     // direction
     // 0 - forward
     // 1 - backward

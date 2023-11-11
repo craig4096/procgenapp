@@ -2,7 +2,8 @@
 #define RADIALPROBFUNC_H
 #include "ProbabilityFunction.h"
 
-class RadialProbFunc : public ProbabilityFunction {
+class RadialProbFunc : public ProbabilityFunction
+{
     float minProb, maxProb;
     float radius;
     vec3 position;

@@ -2,7 +2,8 @@
 #ifndef PROGRESS_H
 #define PROGRESS_H
 
-class Progress {
+class Progress
+{
 public:
     // sets the progress (in percent) of a certain operation
     virtual void setPercent(float) = 0;

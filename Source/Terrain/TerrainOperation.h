@@ -5,7 +5,8 @@
 #include "Progress.h"
 #include "IPropertyInspector.h"
 
-class TerrainOperation {
+class TerrainOperation
+{
 public:
     virtual ~TerrainOperation() {}
 

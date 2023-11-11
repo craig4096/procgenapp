@@ -1,17 +1,14 @@
 #ifndef BSGMODULE_H
 #define BSGMODULE_H
 
-#include <QObject>
+#include "MainWindow.h"
 #include "Structural/BasicShapeGrammar.h"
 #include "Viewport3D.h"
 #include <vector>
 #include "Mesh.h"
 
-namespace Ui { class Application; }
-
-class BSGModule : public QObject, public Viewport3D::Renderer {
-    Q_OBJECT
-
+class BSGModule : public Viewport3D::Renderer
+{
     ShapeDatabase shapeDatabase;
     BasicShapeGrammar* activeGrammar;
 
@@ -27,29 +24,29 @@ class BSGModule : public QObject, public Viewport3D::Renderer {
     std::string currentOpenFile;
 
     // application ui
-    Ui::Application* ui;
+    MainWindow* mainWindow;
 
     // used for rendering the floor grid
-    QImage floorGridTex;
+    //wxImage floorGridTex;
 
     // used for rendering the floor grid
-    GLuint floorGridTexture;
+    //GLuint floorGridTexture;
 
 public:
-    explicit BSGModule(Ui::Application*, QObject *parent = 0);
+    explicit BSGModule(MainWindow* mainWindow);
     ~BSGModule();
+
+    Viewport3D* GetViewport() { return viewport; }
 
     void viewportInit(Viewport3D*);
     void viewportDraw(Viewport3D*);
-
-public slots:
 
     void load();
     void save();
     void clear();
     void apply();
     void setNumIterations(int);
-    
+
 };
 
 #endif // BSGMODULE_H

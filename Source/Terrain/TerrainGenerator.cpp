@@ -8,29 +8,35 @@ TerrainGenerator::TerrainGenerator(int heightmapWidth, int heightmapHeight)
 }
 
 
-void TerrainGenerator::addOperation(TerrainOperation* op) {
+void TerrainGenerator::addOperation(TerrainOperation* op)
+{
     operations.push_back(op);
 }
 
-TerrainOperation* TerrainGenerator::removeOperation(int index) {
+TerrainOperation* TerrainGenerator::removeOperation(int index)
+{
     TerrainOperation* op = operations[index];
-    operations.erase(operations.begin()+index);
+    operations.erase(operations.begin() + index);
     return op;
 }
 
-class NullProgress : public Progress {
+class NullProgress : public Progress
+{
 public:
     void setPercent(float) {}
     void nextOperation(int) {}
 };
 
-Heightmap* TerrainGenerator::generateTerrain(Progress* progress) {
+Heightmap* TerrainGenerator::generateTerrain(Progress* progress)
+{
     NullProgress p;
-    if(progress == NULL) {
+    if (progress == nullptr)
+    {
         progress = &p;
     }
     // apply all operations to the terrain
-    for(int i = 0; i < operations.size(); ++i) {
+    for (int i = 0; i < operations.size(); ++i)
+    {
         progress->nextOperation(i);
         //ui->terrain_active_oplist->repaint();
         operations[i]->operate(&stack, progress);
@@ -41,7 +47,8 @@ Heightmap* TerrainGenerator::generateTerrain(Progress* progress) {
     return h;
 }
 
-TerrainOperation* TerrainGenerator::getOperation(int index) {
+TerrainOperation* TerrainGenerator::getOperation(int index)
+{
     if (index >= 0 && index < operations.size())
     {
         return operations[index];
@@ -49,13 +56,17 @@ TerrainOperation* TerrainGenerator::getOperation(int index) {
     return nullptr;
 }
 
-void TerrainGenerator::switchOperations(int indexA, int indexB) {
+void TerrainGenerator::switchOperations(int indexA, int indexB)
+{
     std::swap(operations[indexA], operations[indexB]);
 }
 
-void TerrainGenerator::clearOperations(bool del) {
-    if(del) {
-        for(int i = 0; i < operations.size(); ++i) {
+void TerrainGenerator::clearOperations(bool del)
+{
+    if (del)
+    {
+        for (int i = 0; i < operations.size(); ++i)
+        {
             delete operations[i];
         }
     }

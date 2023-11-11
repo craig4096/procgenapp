@@ -8,7 +8,8 @@
 #define DEG_TO_RAD (M_PI/180.0f)
 #define RAD_TO_DEG (180.0f/M_PI)
 
-struct vec2 {
+struct vec2
+{
     float x, y;
 
     vec2();
@@ -23,7 +24,8 @@ struct vec2 {
     void print();
 };
 
-struct vec3 {
+struct vec3
+{
     float x, y, z;
 
     vec3();
@@ -53,15 +55,18 @@ struct vec3 {
 
 std::ostream& operator <<(std::ostream& cout, const vec3&);
 
-struct Line3d {
+struct Line3d
+{
     vec3 a, b;
 };
 
-struct matrix4 {
+struct matrix4
+{
     float e[16];
 };
 
-struct Plane3d {
+struct Plane3d
+{
     vec3	normal;
     float	distance;
 };
@@ -71,11 +76,13 @@ struct Sphere {
     float	radius;
 };
 
-struct Triangle {
+struct Triangle
+{
     vec3 a, b, c;
 };
 
-struct BoundingBox {
+struct BoundingBox
+{
     vec3 min, max;
 
     bool intersects(const BoundingBox& bb) const;

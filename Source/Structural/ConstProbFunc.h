@@ -2,7 +2,8 @@
 #define CONSTPROBFUNC_H
 #include "ProbabilityFunction.h"
 
-class ConstProbFunc : public ProbabilityFunction {
+class ConstProbFunc : public ProbabilityFunction
+{
     float value;
 public:
     ConstProbFunc(float value);

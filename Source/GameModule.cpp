@@ -1,95 +1,152 @@
 #include "GameModule.h"
-#include "ui_application.h"
-#include <QTimer>
-#include <QKeyEvent>
 
-GameModule::GameModule(Ui::Application* ui, QWidget *parent)
-    : QOpenGLWidget(parent)
+#include <wx/wx.h>
+
+BEGIN_EVENT_TABLE(GameModule, wxGLCanvas)
+EVT_PAINT(GameModule::paintGL)
+EVT_SIZE(GameModule::resizeGL)
+EVT_KEY_DOWN(GameModule::keyDown)
+EVT_KEY_UP(GameModule::keyUp)
+EVT_LEFT_DOWN(GameModule::leftDown)
+EVT_LEFT_UP(GameModule::leftUp)
+EVT_ENTER_WINDOW(GameModule::mouseEnter)
+EVT_LEAVE_WINDOW(GameModule::mouseExit)
+END_EVENT_TABLE()
+
+GameModule::GameModule(MainWindow* mainWindow)
+    : wxGLCanvas(mainWindow->game_viewport, wxID_ANY)
+    , mainWindow(mainWindow)
+    , updateTimer(this)
 {
+    context = new wxGLContext(this);
+    SetCurrent(*context);
 
     game = new GameDemo();
-       // GameModule is a controller for the game model - it also acts as
-    // a rendering widget
-    ui->game_viewport->addWidget(this);
-    //updateGL();
 
-    this->setFocusPolicy(Qt::StrongFocus);
+    game->initGL();
+
+    Connect(wxID_ANY, wxEVT_TIMER, wxTimerEventHandler(GameModule::update));
+
+    mainWindow->simplebook->Bind(wxEVT_NOTEBOOK_PAGE_CHANGED, [this](wxCommandEvent& event)
+        {
+            // If we have switched into the game demo page...
+            if (this->mainWindow->simplebook->GetSelection() == 3)
+            {
+                game->generateLevel(rand());
+
+                // start the timer to regulate the drawing of the widget
+                updateTimer.Start(33);
+
+                this->SetFocus();
+            }
+            else
+            {
+                updateTimer.Stop();
+            }
+        });
+
+    mainWindow->game_viewport_sizer->Add(this, 1, wxEXPAND);
 }
 
 GameModule::~GameModule()
 {
     delete game;
+    delete context;
 }
 
-void GameModule::initializeGL() {
-    game->initGL();
+void GameModule::paintGL(wxPaintEvent& event)
+{
+    SetCurrent(*context);
+    wxPaintDC(this);
 
-    // create a timer to regulate the drawing of the widget
-    QTimer* timer = new QTimer();
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start(33);
-}
+    const wxSize size = GetSize();
+    const int w = size.GetWidth();
+    const int h = size.GetHeight();
 
-void GameModule::paintGL() {
-    game->update(1.0f/30.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    game->draw();
-}
-
-void GameModule::mousePressEvent(QMouseEvent *) {
-    game->mousePressed();
-}
-
-void GameModule::mouseReleaseEvent(QMouseEvent *) {
-    game->mouseReleased();
-}
-
-void GameModule::keyPressEvent(QKeyEvent* event) {
-    switch(event->key()) {
-    case Qt::Key_W: game->move(0, true); break;
-    case Qt::Key_S: game->move(1, true); break;
-    case Qt::Key_A: game->move(2, true); break;
-    case Qt::Key_D: game->move(3, true); break;
-
-    case Qt::Key_Up: game->rotate(0, true); break;
-    case Qt::Key_Down: game->rotate(1, true); break;
-    case Qt::Key_Left: game->rotate(2, true); break;
-    case Qt::Key_Right: game->rotate(3, true); break;
-    }
-}
-
-void GameModule::keyReleaseEvent(QKeyEvent* event) {
-    switch(event->key()) {
-    case Qt::Key_W: game->move(0, false); break;
-    case Qt::Key_S: game->move(1, false); break;
-    case Qt::Key_A: game->move(2, false); break;
-    case Qt::Key_D: game->move(3, false); break;
-
-    case Qt::Key_Up: game->rotate(0, false); break;
-    case Qt::Key_Down: game->rotate(1, false); break;
-    case Qt::Key_Left: game->rotate(2, false); break;
-    case Qt::Key_Right: game->rotate(3, false); break;
-    }
-}
-
-void GameModule::resizeGL(int w, int h) {
-    //cout << "RESIZE GL CALLED" << endl;
     glViewport(0, 0, (GLint)w, (GLint)h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    if(h != 0) {
+    if (h != 0)
+    {
         gluPerspective(60.0f, w / (float)h, 0.01f, 10000.0f);
-    } else {
+    }
+    else
+    {
         gluPerspective(60.0f, 0.0f, 0.01f, 1000.0f);
     }
     glMatrixMode(GL_MODELVIEW);
+
+    game->update(1.0f / 30.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    game->draw();
+
+    glFlush();
+    SwapBuffers();
 }
 
-
-void GameModule::begin() {
-    game->generateLevel(rand());
+void GameModule::resizeGL(wxSizeEvent& event)
+{
+    Refresh();
 }
 
-void GameModule::end() {
+void GameModule::leftDown(wxMouseEvent& event)
+{
+    game->mousePressed();
 
+    SetFocus();
+}
+
+void GameModule::leftUp(wxMouseEvent& event)
+{
+    game->mouseReleased();
+}
+
+void GameModule::mouseEnter(wxMouseEvent& event)
+{
+    game->mouseEnter();
+}
+
+void GameModule::mouseExit(wxMouseEvent& event)
+{
+    game->mouseExit();
+}
+
+void GameModule::keyEvent(wxKeyEvent& event, bool keyDown)
+{
+    wxChar uc = event.GetUnicodeKey();
+    if (uc != WXK_NONE)
+    {
+        switch (uc)
+        {
+        case 'W': game->move(0, keyDown); break;
+        case 'S': game->move(1, keyDown); break;
+        case 'A': game->move(2, keyDown); break;
+        case 'D': game->move(3, keyDown); break;
+        }
+    }
+    else
+    {
+        switch (event.GetKeyCode())
+        {
+        case WXK_UP: game->rotate(0, keyDown); break;
+        case WXK_DOWN: game->rotate(1, keyDown); break;
+        case WXK_LEFT: game->rotate(2, keyDown); break;
+        case WXK_RIGHT: game->rotate(3, keyDown); break;
+        }
+    }
+}
+
+void GameModule::keyDown(wxKeyEvent& event)
+{
+    keyEvent(event, true);
+}
+
+void GameModule::keyUp(wxKeyEvent& event)
+{
+    keyEvent(event, false);
+}
+
+void GameModule::update(wxTimerEvent& event)
+{
+    Refresh();
 }

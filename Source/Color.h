@@ -1,7 +1,8 @@
 
 #pragma once
 
-class Color {
+class Color
+{
 public:
     float red, green, blue;
     Color();

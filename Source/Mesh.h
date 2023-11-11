@@ -7,7 +7,8 @@
 #include <vector>
 #include "math3d.h"
 
-class SubMesh {
+class SubMesh
+{
     GLuint vertices;
     GLuint indices;
     GLuint texcoords;
@@ -25,7 +26,8 @@ public:
     const std::string& getMaterialName() const { return materialName; }
 };
 
-class Mesh {
+class Mesh
+{
     std::vector<SubMesh> meshes;
     BoundingBox bounds;
 public:

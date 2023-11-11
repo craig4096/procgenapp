@@ -1,36 +1,38 @@
 #ifndef GAMEMODULE_H
 #define GAMEMODULE_H
 
+#include "MainWindow.h"
 #include "GL/glew.h"
-#include <QObject>
-#include <QOpenGLWidget>
 #include "Game/GameDemo.h"
+#include <wx/glcanvas.h>
+#include <wx/timer.h>
 
-namespace Ui {
-    class Application;
-}
-
-class GameModule : public QOpenGLWidget
+class GameModule : public wxGLCanvas
 {
-    Q_OBJECT
     GameDemo* game;
+    wxGLContext* context;
+    wxTimer updateTimer;
+    MainWindow* mainWindow;
+
 public:
-    explicit GameModule(Ui::Application*, QWidget *parent = 0);
+    explicit GameModule(MainWindow* mainWindow);
     ~GameModule();
 
-    void initializeGL();
-    void paintGL();
-    void resizeGL(int w, int h);
+    void paintGL(wxPaintEvent& event);
+    void resizeGL(wxSizeEvent& event);
 
-    // starts and ends the game session
-    void begin();
-    void end();
+    void keyDown(wxKeyEvent& event);
+    void keyUp(wxKeyEvent& event);
+    void keyEvent(wxKeyEvent& event, bool keyDown);
 
-    void keyPressEvent(QKeyEvent*);
-    void keyReleaseEvent(QKeyEvent*);
+    void update(wxTimerEvent& event);
 
-    void mousePressEvent(QMouseEvent*);
-    void mouseReleaseEvent(QMouseEvent*);
+    void leftDown(wxMouseEvent& event);
+    void leftUp(wxMouseEvent& event);
+    void mouseEnter(wxMouseEvent& event);
+    void mouseExit(wxMouseEvent& event);
+
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // GAMEMODULE_H
