@@ -98,10 +98,6 @@ void Shader::load(const string& vertexfile, const string& fragfile)
         // get the error
         glGetShaderInfoLog(fragmentShader, 2048, &length, errormsg);
 
-        std::ofstream ofs("C:\\Users\\craig\\Desktop\\log.txt");
-        ofs << errormsg << std::endl;
-        ofs.close();
-
         throw logic_error(errormsg);
     }
 
@@ -159,7 +155,7 @@ std::string Shader::processIncludes(const std::string& shaderFile)
             {
                 std::string fileToInclude = line.substr(begin + 1, (end - (begin + 1)));
 
-                std::ifstream file("C:\\Users\\craig\\projects\\procgenapp\\Bin\\" + fileToInclude);
+                std::ifstream file(fileToInclude);
                 if (file.good())
                 {
                     oss << file.rdbuf();

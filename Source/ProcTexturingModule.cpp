@@ -44,8 +44,8 @@ void ProcTexturingModule::viewportDraw(Viewport3D*)
         // try to load new shader
         try
         {
-            Shader* tmp = new Shader("shaders/std_vertex.glslv", activeFragShaderFilename); // FIXME: if exception is thrown does this get deallocated?
             shaderInvalid = false;
+            Shader* tmp = new Shader("shaders/std_vertex.glslv", activeFragShaderFilename);
             // delete previous shader and assign new
             delete shader;
             shader = tmp;
