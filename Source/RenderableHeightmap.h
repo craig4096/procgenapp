@@ -3,6 +3,7 @@
 
 #include "GL/glew.h"
 #include "Heightmap.h"
+#include "Shader.h"
 
 class RenderableHeightmap : public Heightmap
 {
@@ -25,7 +26,7 @@ public:
     RenderableHeightmap(Heightmap*);
     ~RenderableHeightmap();
 
-    void Draw();
+    void Draw(Shader& shader);
     // should be called after gl context has been initialized
     void CreateRenderData();
 };

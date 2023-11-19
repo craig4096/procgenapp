@@ -1,12 +1,22 @@
+#version 330 core
 
-varying vec3 pos;
-varying vec3 viewSpacePos;
-varying vec3 normal;
+uniform mat4 viewMat;
+uniform mat4 modelViewProjectionMatrix;
 
-void main() {
-	pos = gl_Vertex.xyz;
-	viewSpacePos = (gl_ModelViewMatrix * gl_Vertex).xyz;
-	normal = gl_Normal;
-	gl_TexCoord[0].st = gl_MultiTexCoord0.st;
-	gl_Position = ftransform();
+in vec3 vertexPosition;
+in vec3 vertexNormal;
+in vec2 vertexTexCoord;
+
+out vec3 pos;
+out vec3 viewSpacePos;
+out vec3 normal;
+out vec2 texCoord;
+
+void main()
+{
+    pos = vertexPosition.xyz;
+    viewSpacePos = (viewMat * vec4(vertexPosition, 1.0)).xyz;
+    normal = vertexNormal;
+    texCoord = vertexTexCoord;
+    gl_Position = modelViewProjectionMatrix * vec4(vertexPosition, 1.0);
 }

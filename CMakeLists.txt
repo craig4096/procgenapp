@@ -5,11 +5,12 @@ project(procgenapp)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(wxWidgets CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
 file(GLOB_RECURSE SRC_FILES Source/*.cpp Source/*.h)
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-target_link_libraries(procgenapp PRIVATE wx::core wx::base wx::gl wx::propgrid GLEW::GLEW)
+target_link_libraries(procgenapp PRIVATE wx::core wx::base wx::gl wx::propgrid GLEW::GLEW glm::glm)
 
 if(WIN32)
   target_link_options(procgenapp PRIVATE "/SUBSYSTEM:WINDOWS")

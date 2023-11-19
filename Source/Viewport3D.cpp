@@ -2,6 +2,7 @@
 #include <wx/wx.h>
 #include "math3d.h"
 #include <iostream>
+#include <glm/ext.hpp>
 
 using namespace std;
 
@@ -64,6 +65,18 @@ Viewport3D::~Viewport3D()
     delete context;
 }
 
+void Viewport3D::updateMatricesFromGL()
+{
+    glGetFloatv(GL_PROJECTION_MATRIX, glm::value_ptr(projectionMatrix));
+    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelViewMatrix));
+
+    // save model view projection matrix
+    modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
+
+    // calculate the normal matrix
+    normalMatrix = glm::transpose(glm::inverse(modelViewMatrix));
+}
+
 void Viewport3D::resizeGL(wxSizeEvent& event)
 {
     Refresh();
@@ -100,7 +113,8 @@ void Viewport3D::paintGL(wxPaintEvent& event)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(cameraPosition.x, cameraPosition.y, cameraPosition.z, 0, 0, 0, 0, 1, 0);
-    glGetFloatv(GL_MODELVIEW_MATRIX, (float*)&viewMatrix);
+
+    updateMatricesFromGL();
 
     skybox->Draw(cameraPosition, 1000.0f);
 

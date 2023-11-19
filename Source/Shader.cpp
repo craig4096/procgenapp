@@ -158,13 +158,13 @@ std::string Shader::processIncludes(const std::string& shaderFile)
                 std::ifstream file(fileToInclude);
                 if (file.good())
                 {
-                    oss << file.rdbuf();
+                    oss << file.rdbuf() << std::endl;
                 }
             }
         }
         else
         {
-            oss << line;
+            oss << line << std::endl;
         }
     }
 

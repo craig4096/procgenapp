@@ -2,6 +2,7 @@
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 #include <fstream>
+#include <glm/ext.hpp>
 
 // include terrain operations
 #include "Terrain/Normalization.h"
@@ -340,13 +341,26 @@ void TerrainModule::exportTerrain()
     }
 }
 
+void TerrainModule::viewportInit(Viewport3D*)
+{
+    shader = std::make_unique<Shader>("shaders/std_vertex.glslv", "shaders/std_frag.glslf");
+}
+
 void TerrainModule::viewportDraw(Viewport3D*)
 {
     // draw the last heightmap on the stack
     if (activeHeightmap != nullptr)
     {
         activeHeightmap->CreateRenderData();
-        activeHeightmap->Draw();
+
+        shader->Set();
+        glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "viewMat"), 1, GL_FALSE, glm::value_ptr(viewport->getModelViewMatrix()));
+        glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "modelViewProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(viewport->getModelViewProjectionMatrix()));
+        glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "normalMatrix"), 1, GL_FALSE, glm::value_ptr(viewport->getNormalMatrix()));
+
+        activeHeightmap->Draw(*shader);
+
+        shader->Unset();
     }
 }
 

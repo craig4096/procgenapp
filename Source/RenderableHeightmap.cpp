@@ -129,21 +129,14 @@ void RenderableHeightmap::CreateRenderData()
     }
 
     glGenBuffers(1, &vertexBuffer);
-    //cout << "Vertex Buffer: " << vertexBuffer << endl;
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(vec3), vertices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &normalBuffer);
-    //cout << "Normal Buffer: " << normalBuffer << endl;
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
     glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(vec3), normals, GL_STATIC_DRAW);
 
-    //glGenBuffersARB(1, &texcoordsBuffer);
-   // glBindBufferARB(GL_ARRAY_BUFFER, texcoordsBuffer);
-   // glBufferDataARB(GL_ARRAY_BUFFER, vertexCount*sizeof(vec2), texcoords, GL_STATIC_DRAW);
-
     glGenBuffers(1, &indexBuffer);
-    //cout << "Index Buffer: " << indexBuffer << endl;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(int), indices, GL_STATIC_DRAW);
 
@@ -153,7 +146,7 @@ void RenderableHeightmap::CreateRenderData()
     renderDataCreated = true;
 }
 
-void RenderableHeightmap::Draw()
+void RenderableHeightmap::Draw(Shader& shader)
 {
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -176,31 +169,22 @@ void RenderableHeightmap::Draw()
 
     GLfloat pos[4] = { 0,1,1,0 };
     glLightfv(GL_LIGHT0, GL_POSITION, pos);
-    //cout << "enabling client states" << endl;
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    //glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    //cout << "Binding vertex buffer: " << vertexBuffer << endl;
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glVertexPointer(3, GL_FLOAT, 0, 0);
+    GLint vertexLoc = glGetAttribLocation(shader.GetProgram(), "vertexPosition");
+    glEnableVertexAttribArray(vertexLoc);
+    glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    //cout << "Binding normalsBuffer: " << normalBuffer << endl;
     glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
-    glNormalPointer(GL_FLOAT, 0, 0);
+    const GLint normalLoc = glGetAttribLocation(shader.GetProgram(), "vertexNormal");
+    glEnableVertexAttribArray(normalLoc);
+    glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    // glBindBufferARB(GL_ARRAY_BUFFER, texcoordsBuffer);
-    // glTexCoordPointer(2, GL_FLOAT, 0, 0);
-
-    // cout << "Binding indices buffer" << endl;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-    //cout << "drawing elements: indexBuffer: " << indexBuffer << " indexCount: " << indexCount << endl;
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 
-    //cout << "disabling client state" << endl;
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-    //glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableVertexAttribArray(vertexLoc);
+    glDisableVertexAttribArray(normalLoc);
 
     glColor3f(1, 1, 1);
     glDisable(GL_LIGHTING);

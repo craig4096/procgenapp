@@ -3,7 +3,7 @@
 
 #include "GL/glew.h"
 #include <wx/glcanvas.h>
-#include "math3d.h"
+#include <glm/glm.hpp>
 #include "Skybox.h"
 
 class Viewport3D : public wxGLCanvas
@@ -31,14 +31,21 @@ private:
     float       camMinDist;
     float       camRotWeight;
 
-    matrix4     viewMatrix;
+    glm::mat4 modelViewMatrix;
+    glm::mat4 projectionMatrix;
+    glm::mat4 modelViewProjectionMatrix;
+    glm::mat4 normalMatrix;
 
     wxGLContext* context;
 public:
     explicit Viewport3D(wxWindow* parent, Renderer* renderer, const std::string& skyboxDir, float zoomRate, float camMinDist, float camRotWeight);
     ~Viewport3D();
 
-    const matrix4& getViewMatrix() const { return viewMatrix; }
+    const glm::mat4& getModelViewMatrix() const { return modelViewMatrix; }
+    const glm::mat4& getProjectionMatrix() const { return projectionMatrix; }
+    const glm::mat4& getModelViewProjectionMatrix() const { return modelViewProjectionMatrix; }
+    const glm::mat4& getNormalMatrix() const { return normalMatrix; }
+    void updateMatricesFromGL();
 
     void resizeGL(wxSizeEvent& event);
     void paintGL(wxPaintEvent& event);

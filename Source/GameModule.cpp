@@ -63,18 +63,7 @@ void GameModule::paintGL(wxPaintEvent& event)
     const int w = size.GetWidth();
     const int h = size.GetHeight();
 
-    glViewport(0, 0, (GLint)w, (GLint)h);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    if (h != 0)
-    {
-        gluPerspective(60.0f, w / (float)h, 0.01f, 10000.0f);
-    }
-    else
-    {
-        gluPerspective(60.0f, 0.0f, 0.01f, 1000.0f);
-    }
-    glMatrixMode(GL_MODELVIEW);
+    game->setProjectionMatrix(w, h);
 
     game->update(1.0f / 30.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

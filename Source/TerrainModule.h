@@ -8,6 +8,7 @@
 #include "RenderableHeightmap.h"
 #include "Terrain/TerrainGenerator.h"
 #include "MainWindow.h"
+#include "Shader.h"
 
 class TerrainOperation;
 
@@ -34,6 +35,8 @@ class TerrainModule : public Viewport3D::Renderer, public Progress
     // constructor so the user can see the results
     RenderableHeightmap* activeHeightmap;
 
+    std::unique_ptr<Shader> shader;
+
     // selects an operation from the list (switches tab connects signals and slots)
     void selectOperation(TerrainOperation*);
 
@@ -54,7 +57,7 @@ public:
     void nextOperation(int index);
     void setPercent(float);
 
-    void viewportInit(Viewport3D*) {}
+    void viewportInit(Viewport3D*);
     void viewportDraw(Viewport3D*);
 };
 

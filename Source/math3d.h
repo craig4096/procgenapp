@@ -55,32 +55,6 @@ struct vec3
 
 std::ostream& operator <<(std::ostream& cout, const vec3&);
 
-struct Line3d
-{
-    vec3 a, b;
-};
-
-struct matrix4
-{
-    float e[16];
-};
-
-struct Plane3d
-{
-    vec3	normal;
-    float	distance;
-};
-
-struct Sphere {
-    vec3	center;
-    float	radius;
-};
-
-struct Triangle
-{
-    vec3 a, b, c;
-};
-
 struct BoundingBox
 {
     vec3 min, max;

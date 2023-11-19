@@ -81,39 +81,29 @@ void SubMesh::Unload()
     glDeleteBuffers(1, &texcoords);
 }
 
-void SubMesh::Draw()
+void SubMesh::Draw(Shader& shader)
 {
-    //glEnable(GL_TEXTURE_2D);
-    // bind the texture
-    //glBindTexture(GL_TEXTURE_2D, texture);
+    glBindBuffer(GL_ARRAY_BUFFER, vertices);
+    GLint vertexLoc = glGetAttribLocation(shader.GetProgram(), "vertexPosition");
+    glEnableVertexAttribArray(vertexLoc);
+    glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    DrawNoTextures();
+    glBindBuffer(GL_ARRAY_BUFFER, normals);
+    const GLint normalLoc = glGetAttribLocation(shader.GetProgram(), "vertexNormal");
+    glEnableVertexAttribArray(normalLoc);
+    glVertexAttribPointer(normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-    // glBindTexture(GL_TEXTURE_2D, 0);
-     //glDisable(GL_TEXTURE_2D);
-}
+    glBindBuffer(GL_ARRAY_BUFFER, texcoords);
+    const GLint texLoc = glGetAttribLocation(shader.GetProgram(), "vertexTexCoord");
+    glEnableVertexAttribArray(texLoc);
+    glVertexAttribPointer(texLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-void SubMesh::DrawNoTextures()
-{
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-    glBindBufferARB(GL_ARRAY_BUFFER, vertices);
-    glVertexPointer(3, GL_FLOAT, 0, 0);
-
-    glBindBufferARB(GL_ARRAY_BUFFER, normals);
-    glNormalPointer(GL_FLOAT, 0, 0);
-
-    glBindBufferARB(GL_ARRAY_BUFFER, texcoords);
-    glTexCoordPointer(2, GL_FLOAT, 0, 0);
-
-    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, indices);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
 
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableVertexAttribArray(vertexLoc);
+    glDisableVertexAttribArray(normalLoc);
+    glDisableVertexAttribArray(texLoc);
 }
 
 Mesh::Mesh(const string& filename)
@@ -151,19 +141,11 @@ Mesh::~Mesh()
     }
 }
 
-void Mesh::Draw()
+void Mesh::Draw(Shader& shader)
 {
     for (int i = 0; i < meshes.size(); ++i)
     {
-        meshes[i].Draw();
-    }
-}
-
-void Mesh::DrawNoTextures()
-{
-    for (int i = 0; i < meshes.size(); ++i)
-    {
-        meshes[i].DrawNoTextures();
+        meshes[i].Draw(shader);
     }
 }
 

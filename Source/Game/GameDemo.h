@@ -9,6 +9,7 @@
 #include "../Structural/ShapeDatabase.h"
 #include "../Structural/BasicShapeGrammar.h"
 #include "math3d.h"
+#include <glm/glm.hpp>
 
 class GameDemo
 {
@@ -66,17 +67,44 @@ class GameDemo
     // dungeon entrances
     std::vector<DungeonEntrance> dungeonEntrances;
 
+    void drawTerrain();
     void drawDungeonEntrances();
+    void drawWater();
+    void drawWaterGrid(Shader& shader, float time);
+    void drawWaterBounds(Shader& shader);
+    void drawOutside();
+    void drawDungeon();
+    void drawClouds();
 
     void generateDungeon(int seed);
 
-    void drawOutside();
-    void drawDungeon();
-
     // saved view matrix for each frame (used for setting lightDir in shaders)
-    matrix4 viewMat;
+    // TODO: use Viewport3D
+    glm::mat4 modelViewMatrix;
+    glm::mat4 projectionMatrix;
+    glm::mat4 modelViewProjectionMatrix;
+    glm::mat4 normalMatrix;
+    void updateMatrices();
 
     bool flyMode;
+
+    // Water grid (TODO: Use RenderableHeightmap)
+    GLuint waterGridVertexBuffer;
+    GLuint waterGridIndexBuffer;
+    std::vector<float> waterGridVertices;
+    std::vector<int> waterGridIndices;
+
+    // Water bounds (TODO: Use Mesh)
+    GLuint waterBoundsVertexBuffer;
+    GLuint waterBoundsIndexBuffer;
+    std::vector<float> waterBoundsVertices;
+    std::vector<int> waterBoundsIndices;
+
+    // Clouds (TODO: Use Mesh)
+    GLuint cloudsVertexBuffer;
+    GLuint cloudsIndexBuffer;
+    std::vector<float> cloudsVertices;
+    std::vector<int> cloudsIndices;
 
 public:
     GameDemo();
@@ -86,6 +114,7 @@ public:
     void update(float timeStep);
     void draw();
     void initGL();
+    void setProjectionMatrix(int w, int h);
 
     void mousePressed();
     void mouseReleased();

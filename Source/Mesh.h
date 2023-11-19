@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "math3d.h"
+#include "Shader.h"
 
 class SubMesh
 {
@@ -21,8 +22,7 @@ public:
     const BoundingBox& getBounds() const { return bounds; }
     void Load(std::ifstream&);
     void Unload();
-    void Draw();
-    void DrawNoTextures();
+    void Draw(Shader& shader);
     const std::string& getMaterialName() const { return materialName; }
 };
 
@@ -34,8 +34,7 @@ public:
     const BoundingBox& getBounds() const { return bounds; }
     Mesh(const std::string& filename);
     ~Mesh();
-    void Draw();
-    void DrawNoTextures();
+    void Draw(Shader& shader);
 
     int getSubMeshCount() const { return meshes.size(); }
     SubMesh* getSubMesh(int index) { return &meshes[index]; }

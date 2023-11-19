@@ -6,6 +6,7 @@
 #include "Viewport3D.h"
 #include <vector>
 #include "Mesh.h"
+#include "Shader.h"
 
 class BSGModule : public Viewport3D::Renderer
 {
@@ -20,17 +21,13 @@ class BSGModule : public Viewport3D::Renderer
 
     Viewport3D* viewport;
 
+    std::unique_ptr<Shader> shader;
+
     // the filename of the currently opened grammar file, empty if no file currently loaded
     std::string currentOpenFile;
 
     // application ui
     MainWindow* mainWindow;
-
-    // used for rendering the floor grid
-    //wxImage floorGridTex;
-
-    // used for rendering the floor grid
-    //GLuint floorGridTexture;
 
 public:
     explicit BSGModule(MainWindow* mainWindow);

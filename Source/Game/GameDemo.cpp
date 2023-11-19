@@ -8,6 +8,7 @@
 #include <iostream>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <glm/ext.hpp>
 
 #include "../Terrain/TerrainGenerator.h"
 #include "../Terrain/PerlinNoise.h"
@@ -17,6 +18,11 @@
 
 using namespace std;
 
+static const int terrainSize = 512;
+static const int waterGridSize = 50;
+static const float waterGridScale = 12.0f;
+static const float cloudPlaneSize = 300.0f;
+
 GameDemo::GameDemo()
     : heightmap(nullptr)
     , levelGenerated(false)
@@ -24,7 +30,7 @@ GameDemo::GameDemo()
     , time(0.0f)
     , resetX(50)
     , resetY(50)
-    , rotationX(0.0f)
+    , rotationX(90.0f)
     , rotationY(0.0f)
     , mousePressing(false)
     , forward(false)
@@ -32,6 +38,12 @@ GameDemo::GameDemo()
     , left(false)
     , right(false)
     , flyMode(true)
+    , waterGridVertexBuffer(-1)
+    , waterGridIndexBuffer(-1)
+    , waterBoundsVertexBuffer(-1)
+    , waterBoundsIndexBuffer(-1)
+    , cloudsVertexBuffer(-1)
+    , cloudsIndexBuffer(-1)
 {
 }
 
@@ -39,6 +51,13 @@ GameDemo::~GameDemo()
 {
     delete skybox;
     delete dungeonEntranceMesh;
+
+    glDeleteBuffers(1, &waterGridVertexBuffer);
+    glDeleteBuffers(1, &waterGridIndexBuffer);
+    glDeleteBuffers(1, &waterBoundsVertexBuffer);
+    glDeleteBuffers(1, &waterBoundsIndexBuffer);
+    glDeleteBuffers(1, &cloudsVertexBuffer);
+    glDeleteBuffers(1, &cloudsIndexBuffer);
 }
 
 
@@ -72,6 +91,140 @@ void GameDemo::initGL()
 
     // load the mapping between shape symbols and mesh objects
     shapes.loadSymbolMeshMap("grammars/dungeon/mapping.txt");
+
+    // Create the water grid vertex + index buffers
+    {
+        glGenBuffers(1, &waterGridVertexBuffer);
+        waterGridVertices.resize(waterGridSize * waterGridSize * 3);
+
+        // Set the x/z coordinates of the vertices (without height)
+        const float startX = -(waterGridSize / 2.0f);
+        const float startZ = -(waterGridSize / 2.0f);
+        int index = 0;
+        for (int z = 0; z < waterGridSize; ++z)
+        {
+            for (int x = 0; x < waterGridSize; ++x)
+            {
+                waterGridVertices[index++] = startX + x;
+                index++; // ignore y
+                waterGridVertices[index++] = startZ + z;
+            }
+        }
+
+        // pre-calculate the water grid index buffer
+        auto GetIndex = [](int x, int y) { return (y * waterGridSize) + x; };
+
+        waterGridIndices.resize((waterGridSize - 1) * (waterGridSize - 1) * 6);
+        index = 0;
+        for (int x = 0; x < waterGridSize - 1; ++x)
+        {
+            for (int y = 0; y < waterGridSize - 1; ++y)
+            {
+                waterGridIndices[index++] = GetIndex(x, y);
+                waterGridIndices[index++] = GetIndex(x, y + 1);
+                waterGridIndices[index++] = GetIndex(x + 1, y + 1);
+                waterGridIndices[index++] = GetIndex(x, y);
+                waterGridIndices[index++] = GetIndex(x + 1, y + 1);
+                waterGridIndices[index++] = GetIndex(x + 1, y);
+            }
+        }
+
+        glGenBuffers(1, &waterGridIndexBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, waterGridIndexBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, waterGridIndices.size() * sizeof(int), &waterGridIndices[0], GL_STATIC_DRAW);
+    }
+
+
+    // Create the water bounds vertex + index buffers
+    {
+        waterBoundsVertices.resize(4 * 4 * 3); // grid of 4x4 vertices
+
+        // construct water bounds vertices
+        int index = 0;
+        for (int j = 0; j < 4; ++j)
+        {
+            for (int i = 0; i < 4; ++i)
+            {
+                float x = (-1.5 + i) * waterGridSize;
+                float z = (-1.5 + j) * waterGridSize;
+
+                if (x < -waterGridSize) x = -10000.0f;
+                if (x >  waterGridSize) x =  10000.0f;
+                if (z < -waterGridSize) z = -10000.0f;
+                if (z >  waterGridSize) z =  10000.0f;
+
+                waterBoundsVertices[index++] = x;
+                waterBoundsVertices[index++] = -4;
+                waterBoundsVertices[index++] = z;
+            }
+        }
+
+        glGenBuffers(1, &waterBoundsVertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, waterBoundsVertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, waterBoundsVertices.size() * sizeof(float), &waterBoundsVertices[0], GL_STATIC_DRAW);
+
+        // index buffer...
+        auto GetIndex = [](int x, int y) { return (y * 4) + x; };
+
+        waterBoundsIndices.resize(3 * 3 * 6);
+        index = 0;
+        for (int y = 0; y < 3; ++y)
+        {
+            for (int x = 0; x < 3; ++x)
+            {
+                waterBoundsIndices[index++] = GetIndex(x, y);
+                waterBoundsIndices[index++] = GetIndex(x, y + 1);
+                waterBoundsIndices[index++] = GetIndex(x + 1, y + 1);
+                waterBoundsIndices[index++] = GetIndex(x, y);
+                waterBoundsIndices[index++] = GetIndex(x + 1, y + 1);
+                waterBoundsIndices[index++] = GetIndex(x + 1, y);
+            }
+        }
+
+        glGenBuffers(1, &waterBoundsIndexBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, waterBoundsIndexBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, waterBoundsIndices.size() * sizeof(int), &waterBoundsIndices[0], GL_STATIC_DRAW);
+    }
+
+    // Create the clouds vertex + index buffers
+    {
+        cloudsVertices.resize(2 * 2 * 3); // grid of 2x2 vertices
+
+        // construct water bounds vertices
+        int index = 0;
+        for (int j = 0; j < 2; ++j)
+        {
+            for (int i = 0; i < 2; ++i)
+            {
+                const float x = ((i - 0.5f) * 2.0f) * cloudPlaneSize;
+                const float z = ((j - 0.5f) * 2.0f) * cloudPlaneSize;
+
+                cloudsVertices[index++] = x;
+                cloudsVertices[index++] = 0.0;
+                cloudsVertices[index++] = z;
+            }
+        }
+
+        glGenBuffers(1, &cloudsVertexBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, cloudsVertexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, cloudsVertices.size() * sizeof(float), &cloudsVertices[0], GL_STATIC_DRAW);
+
+        // index buffer...
+        cloudsIndices.resize(6);
+        cloudsIndices[0] = 0;
+        cloudsIndices[1] = 1;
+        cloudsIndices[2] = 2;
+        cloudsIndices[3] = 1;
+        cloudsIndices[4] = 3;
+        cloudsIndices[5] = 2;
+
+        glGenBuffers(1, &cloudsIndexBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cloudsIndexBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, cloudsIndices.size() * sizeof(int), &cloudsIndices[0], GL_STATIC_DRAW);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 
@@ -81,7 +234,7 @@ void GameDemo::generateLevel(int seed)
     delete heightmap;
 
     // call upon the terrain generator
-    TerrainGenerator tergen(512, 512);
+    TerrainGenerator tergen(terrainSize, terrainSize);
     terrain_ops::PerlinNoise noise;
     noise.setSeed(seed);
     noise.setStartOctave(2);
@@ -137,13 +290,26 @@ void GameDemo::generateLevel(int seed)
     isInDungeon = false;
 }
 
+void GameDemo::updateMatrices()
+{
+    glGetFloatv(GL_PROJECTION_MATRIX, glm::value_ptr(projectionMatrix));
+    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelViewMatrix));
+
+    // save model view projection matrix
+    modelViewProjectionMatrix = projectionMatrix * modelViewMatrix;
+
+    // calculate the normal matrix
+    normalMatrix = glm::transpose(glm::inverse(modelViewMatrix));
+}
 
 void GameDemo::setShader(Shader* shader)
 {
     shader->Set();
     glUniform1f(glGetUniformLocation(shader->GetProgram(), "time"), time);
     // set the view matrix unform
-    glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "viewMat"), 1, GL_FALSE, (GLfloat*)&viewMat);
+    glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "viewMat"), 1, GL_FALSE, glm::value_ptr(modelViewMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "modelViewProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(modelViewProjectionMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "normalMatrix"), 1, GL_FALSE, glm::value_ptr(normalMatrix));
 }
 
 void GameDemo::unsetShader(Shader*)
@@ -188,7 +354,6 @@ void GameDemo::mousePressed()
 void GameDemo::mouseReleased()
 {
     mousePressing = false;
-    //rleft=rright=rforward=rbackward=false;
 }
 
 void GameDemo::mouseEnter()
@@ -219,11 +384,11 @@ void GameDemo::update(float timeStep)
     }
     if (left)
     {
-        newPos -= vec3(rightVec.x, ytrans, rightVec.z) * speed * timeStep;
+        newPos -= vec3(rightVec.x, 0.0, rightVec.z) * speed * timeStep;
     }
     if (right)
     {
-        newPos += vec3(rightVec.x, ytrans, rightVec.z) * speed * timeStep;
+        newPos += vec3(rightVec.x, 0.0, rightVec.z) * speed * timeStep;
     }
 
     static const float rspeed = 45.0f;
@@ -413,7 +578,6 @@ void GameDemo::generateDungeon(int seed)
     {
         std::stringstream ss;
         ss << "grammars/dungeon/stage" << i << ".txt";
-        cout << ">>>>>>>>>>>>>>loading rule file: " << ss.str() << endl;
         BasicShapeGrammar grammar(ss.str());
         grammar.generate(shapes, num_iter[i - 1]);
     }
@@ -429,98 +593,15 @@ void GameDemo::drawMesh(Mesh* mesh)
         ShadersMap::iterator it = shaders.find(m->getMaterialName());
         if (it != shaders.end())
         {
-            setShader(it->second);
-            m->Draw();
-            unsetShader(nullptr);
-        }
-        else
-        {
-            m->Draw();
-        }
-    }
-}
-
-void GameDemo::drawDungeonEntrances()
-{
-    for (int i = 0; i < dungeonEntrances.size(); ++i)
-    {
-        const DungeonEntrance& e = dungeonEntrances[i];
-        glPushMatrix();
-        glTranslatef(e.position.x, e.position.y, e.position.z);
-        glScalef(1, 3, 1);
-        drawMesh(dungeonEntranceMesh);
-        glPopMatrix();
-    }
-}
-
-void drawWaterGrid(int x, int y, float time)
-{
-    float startX = -(x / 2.0f);
-    float startY = -(y / 2.0f);
-
-    glBegin(GL_QUADS);
-    for (int i = 0; i < x; ++i)
-    {
-        for (int j = 0; j < y; ++j)
-        {
-            float xx = startX + i;
-            float yy = startY + j;
-
-            float h1 = sin((i / (float)x) * 2 * M_PI * 10 + (time * 0.5));
-            float h2 = sin(((i + 1) / (float)x) * 2 * M_PI * 10 + (time * 0.5));
-
-            float hh1 = sin((j / (float)y) * 2 * M_PI * 5 + (time * 1.0));
-            float hh2 = sin(((j + 1) / (float)y) * 2 * M_PI * 5 + (time * 1.0));
-
-
-            glVertex3f(xx, h1 * hh2 * 4, yy + 1);
-            glVertex3f(xx + 1, h2 * hh2 * 4, yy + 1);
-            glVertex3f(xx + 1, h2 * hh1 * 4, yy);
-            glVertex3f(xx, h1 * hh1 * 4, yy);
+            Shader* shader = it->second;
+            if (shader)
+            {
+                setShader(shader);
+                m->Draw(*shader);
+                unsetShader(nullptr);
+            }
         }
     }
-    glEnd();
-}
-
-
-void drawWaterBounds(float waterGridWorldSize)
-{
-    // draw 8 quads surrounding the water grid
-    glBegin(GL_QUADS);
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 3; ++j)
-        {
-            if (i == 1 && j == 1) continue;
-            float x1 = (-1.5 + i) * waterGridWorldSize;
-            float y1 = (-1.5 + j) * waterGridWorldSize;
-            float x2 = x1 + waterGridWorldSize;
-            float y2 = y1 + waterGridWorldSize;
-
-            if (x1 < -waterGridWorldSize)
-            {
-                x1 = -10000.0f;
-            }
-            if (x2 > waterGridWorldSize)
-            {
-                x2 = 10000.0f;
-            }
-            if (y1 < -waterGridWorldSize)
-            {
-                y1 = -10000.0f;
-            }
-            if (y2 > waterGridWorldSize)
-            {
-                y2 = 10000.0f;
-            }
-
-            glVertex3f(x1, -4, y2);
-            glVertex3f(x2, -4, y2);
-            glVertex3f(x2, -4, y1);
-            glVertex3f(x1, -4, y1);
-        }
-    }
-    glEnd();
 }
 
 void GameDemo::drawOutside()
@@ -533,89 +614,146 @@ void GameDemo::drawOutside()
 
     skybox->Draw(playerPos);
 
-    //static const float waterSize = 1000.0f;
-
-    // first draw the scene (not inlcuding alpha-blended stuff (clouds)) to the depth buffer
-    glColorMask(0, 0, 0, 0);
-    if (heightmap)
-    {
-        heightmap->Draw();
-    }
-
-    static const int gridSize = 50;
-    static const float gridScale = 12.0f;
-
-    //static const float waterGridWorldSize = gridSize * gridScale;
-
-    glPushMatrix();
-    glTranslatef(0, waterLevel, 0);
-    glScalef(gridScale, 1.0f, gridScale);
-    drawWaterBounds(gridSize);
-    drawWaterGrid(gridSize, gridSize, time);
-    glPopMatrix();
+    drawTerrain();
+    drawWater();
     drawDungeonEntrances();
+    drawClouds();
+}
 
-    glColorMask(1, 1, 1, 1);
-
-
-    // now draw scene without depth test
-    glDepthMask(GL_FALSE);
+void GameDemo::drawTerrain()
+{
     if (heightmap != nullptr)
     {
-        setShader(shaders["terrain"]);
-        heightmap->Draw();
+        Shader* shader = shaders["terrain"];
+
+        setShader(shader);
+        heightmap->Draw(*shader);
         unsetShader(nullptr);
     }
+}
+
+void GameDemo::drawWater()
+{
+    glPushMatrix();
+    glTranslatef(0, waterLevel, 0);
+    glScalef(waterGridScale, 1.0f, waterGridScale);
+    updateMatrices();
 
     // get the water shader
     Shader* s = shaders["water"];
+
     // bind shader
     setShader(s);
 
-    // draw the water quad
-    glPushMatrix();
-    glTranslatef(0, waterLevel, 0);
-    glScalef(gridScale, 1.0f, gridScale);
-    drawWaterBounds(gridSize);
-    drawWaterGrid(gridSize, gridSize, time);
-    glPopMatrix();
+    drawWaterBounds(*s);
+    drawWaterGrid(*s, time);
 
     unsetShader(s);
 
-    drawDungeonEntrances();
+    glPopMatrix();
+    updateMatrices();
+}
 
-    glDepthMask(GL_TRUE);
+void GameDemo::drawWaterBounds(Shader& shader)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, waterBoundsVertexBuffer);
+    GLint vertexLoc = glGetAttribLocation(shader.GetProgram(), "vertexPosition");
+    glEnableVertexAttribArray(vertexLoc);
+    glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, waterBoundsIndexBuffer);
+    glDrawElements(GL_TRIANGLES, waterBoundsIndices.size(), GL_UNSIGNED_INT, 0);
+
+    glDisableVertexAttribArray(vertexLoc);
+}
+
+void GameDemo::drawWaterGrid(Shader& shader, float time)
+{
+    // Update the heights of the water grid vertices
+    int index = 0;
+    for (int z = 0; z < waterGridSize; ++z)
+    {
+        for (int x = 0; x < waterGridSize; ++x)
+        {
+            const float h1 = sin((x / (float)waterGridSize) * 2 * M_PI * 10 + (time * 0.5));
+            const float hh1 = sin((z / (float)waterGridSize) * 2 * M_PI * 5 + (time * 1.0));
+
+            index++; // skip x
+            waterGridVertices[index++] = h1 * hh1 * 4;
+            index++; // skip z
+        }
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, waterGridVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, waterGridVertices.size() * sizeof(float), &waterGridVertices[0], GL_DYNAMIC_DRAW);
+
+    GLint vertexLoc = glGetAttribLocation(shader.GetProgram(), "vertexPosition");
+    glEnableVertexAttribArray(vertexLoc);
+    glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, waterGridIndexBuffer);
+    glDrawElements(GL_TRIANGLES, waterGridIndices.size(), GL_UNSIGNED_INT, 0);
+
+    glDisableVertexAttribArray(vertexLoc);
+}
+
+void GameDemo::drawDungeonEntrances()
+{
+    for (int i = 0; i < dungeonEntrances.size(); ++i)
+    {
+        const DungeonEntrance& e = dungeonEntrances[i];
+        glPushMatrix();
+        glTranslatef(e.position.x, e.position.y, e.position.z);
+        glScalef(1, 3, 1);
+        updateMatrices();
+        drawMesh(dungeonEntranceMesh);
+        glPopMatrix();
+        updateMatrices();
+    }
+}
+
+void GameDemo::drawClouds()
+{
     static const int cloudLayers = 2;
     static float cloudLayerHeights[cloudLayers] = {
         140.0f, 120.0f
     };
     // get the cloud shader
-    s = shaders["clouds"];
-    // bind shader
-    setShader(s);
+    Shader* s = shaders["clouds"];
+
     // enable alpha blending
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glPushMatrix();
-    glTranslatef(playerPos.x, 0.0f, playerPos.z);
-    // draw the clounds texture scolling over the top
+
+    // draw the clouds texture scolling over the top
     for (int i = 0; i < cloudLayers; ++i)
     {
         // draw the water quad
-        glBegin(GL_QUADS);
-        static const float size = 300.0f;
-        glVertex3f(-size, cloudLayerHeights[i], -size);
-        glVertex3f(size, cloudLayerHeights[i], -size);
-        glVertex3f(size, cloudLayerHeights[i], size);
-        glVertex3f(-size, cloudLayerHeights[i], size);
-        glEnd();
+        glPushMatrix();
+        glTranslatef(playerPos.x, cloudLayerHeights[i], playerPos.z);
+        updateMatrices();
+        // bind shader
+        setShader(s);
+
+        // Draw cloud plane
+        glBindBuffer(GL_ARRAY_BUFFER, cloudsVertexBuffer);
+        GLint vertexLoc = glGetAttribLocation(s->GetProgram(), "vertexPosition");
+        glEnableVertexAttribArray(vertexLoc);
+        glVertexAttribPointer(vertexLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cloudsIndexBuffer);
+        glDrawElements(GL_TRIANGLES, cloudsIndices.size(), GL_UNSIGNED_INT, 0);
+
+        glDisableVertexAttribArray(vertexLoc);
+
+        unsetShader(s);
+
+        glPopMatrix();
+        updateMatrices();
     }
-    glPopMatrix();
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
-    unsetShader(s);
 }
 
 void GameDemo::drawDungeon()
@@ -628,9 +766,29 @@ void GameDemo::drawDungeon()
         glPushMatrix();
         glTranslatef(shape.position.x, shape.position.y, shape.position.z);
         glRotatef(shape.yRotation, 0, 1, 0);
+        updateMatrices();
         drawMesh(shapes.getSymbolMeshMap().find(shape.symbol)->second);
         glPopMatrix();
+        updateMatrices();
     }
+}
+
+
+void GameDemo::setProjectionMatrix(int w, int h)
+{
+    glViewport(0, 0, (GLint)w, (GLint)h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    if (h != 0)
+    {
+        gluPerspective(60.0f, w / (float)h, 0.01f, 10000.0f);
+    }
+    else
+    {
+        gluPerspective(60.0f, 0.0f, 0.01f, 1000.0f);
+    }
+
+    glMatrixMode(GL_MODELVIEW);
 }
 
 void GameDemo::draw()
@@ -639,9 +797,7 @@ void GameDemo::draw()
     glLoadIdentity();
     vec3 dst = playerPos + viewDirection;
     gluLookAt(playerPos.x, playerPos.y, playerPos.z, dst.x, dst.y, dst.z, 0, 1, 0);
-
-    // save the view matrix
-    glGetFloatv(GL_MODELVIEW_MATRIX, (float*)&viewMat);
+    updateMatrices();
 
     if (isInDungeon)
     {

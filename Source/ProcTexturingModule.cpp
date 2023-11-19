@@ -4,6 +4,7 @@
 #include <wx/filedlg.h>
 #include <iostream>
 #include <wx/msgdlg.h>
+#include <glm/ext.hpp>
 using namespace std;
 
 ProcTexturingModule::ProcTexturingModule(MainWindow* mainWindow)
@@ -61,10 +62,14 @@ void ProcTexturingModule::viewportDraw(Viewport3D*)
         time += 0.033f;
         shader->Set();
         glUniform1f(glGetUniformLocation(shader->GetProgram(), "time"), time);
-        glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "viewMat"), 1, GL_FALSE, (float*)&viewport->getViewMatrix());
+        glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "viewMat"), 1, GL_FALSE, glm::value_ptr(viewport->getModelViewMatrix()));
+        glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "modelViewProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(viewport->getModelViewProjectionMatrix()));
+        glUniformMatrix4fv(glGetUniformLocation(shader->GetProgram(), "normalMatrix"), 1, GL_FALSE, glm::value_ptr(viewport->getNormalMatrix()));
+
+        mesh->Draw(*shader);
+
+        shader->Unset();
     }
-    mesh->DrawNoTextures();
-    Shader::Unset();
 }
 
 void ProcTexturingModule::saveAndCompile()
