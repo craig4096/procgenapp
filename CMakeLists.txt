@@ -14,8 +14,6 @@ target_link_libraries(procgenapp PRIVATE wx::core wx::base wx::gl wx::propgrid G
 
 if(WIN32)
   target_link_options(procgenapp PRIVATE "/SUBSYSTEM:WINDOWS")
-else()
-  target_link_options(procgenapp PRIVATE "-Wl,--subsystem,windows")
 endif()
 
 target_include_directories(procgenapp PRIVATE ${CMAKE_SOURCE_DIR}/Source/)

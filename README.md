@@ -22,15 +22,17 @@ An application developed for research into various different procedural generati
 ## Build instructions
 Install [vcpkg](https://vcpkg.io/en/) and run the following command to install library dependencies:
 
- ```
-vcpkg install wxwidgets opengl glew
- ```
+```
+vcpkg install wxwidgets opengl glew glm
+```
 
  Then cd into the project root folder and run the following cmake commands:
- ```
+```
 cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=<path_to_vcpkg_dir>\scripts\buildsystems\vcpkg.cmake
-cmake --build build --config Release
- ```
+```
+```
+ cmake --build build --config Release
+```
 
 Replacing the <path_to_vcpkg_dir> with the path to your vcpkg installation folder. This will place the executable and resource files into the /build/Release/ folder. You can build the Debug build by specifying --config Debug instead.
 

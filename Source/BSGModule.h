@@ -7,6 +7,7 @@
 #include <vector>
 #include "Mesh.h"
 #include "Shader.h"
+#include <memory>
 
 class BSGModule : public Viewport3D::Renderer
 {

@@ -9,6 +9,7 @@
 #include "Terrain/TerrainGenerator.h"
 #include "MainWindow.h"
 #include "Shader.h"
+#include <memory>
 
 class TerrainOperation;
 
