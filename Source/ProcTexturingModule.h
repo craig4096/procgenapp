@@ -20,7 +20,7 @@ class ProcTexturingModule : public Viewport3D::Renderer
     float time;
 
 public:
-    explicit ProcTexturingModule(MainWindow* mainWindow);
+    explicit ProcTexturingModule(MainWindow* mainWindow, const wxGLAttributes& displayAttributes);
     ~ProcTexturingModule();
 
     Viewport3D* GetViewport() { return viewport; }

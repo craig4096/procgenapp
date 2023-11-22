@@ -31,7 +31,7 @@ class BSGModule : public Viewport3D::Renderer
     MainWindow* mainWindow;
 
 public:
-    explicit BSGModule(MainWindow* mainWindow);
+    explicit BSGModule(MainWindow* mainWindow, const wxGLAttributes& displayAttributes);
     ~BSGModule();
 
     Viewport3D* GetViewport() { return viewport; }

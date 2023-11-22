@@ -1,5 +1,4 @@
 #include "GameModule.h"
-
 #include <wx/wx.h>
 
 BEGIN_EVENT_TABLE(GameModule, wxGLCanvas)
@@ -13,17 +12,13 @@ EVT_ENTER_WINDOW(GameModule::mouseEnter)
 EVT_LEAVE_WINDOW(GameModule::mouseExit)
 END_EVENT_TABLE()
 
-GameModule::GameModule(MainWindow* mainWindow)
+GameModule::GameModule(MainWindow* mainWindow, const wxGLAttributes& displayAttributes)
     : wxGLCanvas(mainWindow->game_viewport, wxID_ANY)
     , mainWindow(mainWindow)
     , updateTimer(this)
+    , glInitialised(false)
 {
-    context = new wxGLContext(this);
-    SetCurrent(*context);
-
     game = new GameDemo();
-
-    game->initGL();
 
     Connect(wxID_ANY, wxEVT_TIMER, wxTimerEventHandler(GameModule::update));
 
@@ -54,8 +49,25 @@ GameModule::~GameModule()
     delete context;
 }
 
+void GameModule::initialiseGL()
+{
+    wxGLContextAttrs contextAttributes;
+    contextAttributes.CoreProfile().EndList();
+
+    context = new wxGLContext(this, nullptr, &contextAttributes);
+    SetCurrent(*context);
+
+    game->initGL();
+}
+
 void GameModule::paintGL(wxPaintEvent& event)
 {
+    if (!glInitialised)
+    {
+        initialiseGL();
+        glInitialised = true;
+    }
+
     SetCurrent(*context);
     wxPaintDC(this);
 

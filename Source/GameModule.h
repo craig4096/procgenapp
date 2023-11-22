@@ -13,9 +13,12 @@ class GameModule : public wxGLCanvas
     wxGLContext* context;
     wxTimer updateTimer;
     MainWindow* mainWindow;
+    bool glInitialised;
+
+    void initialiseGL();
 
 public:
-    explicit GameModule(MainWindow* mainWindow);
+    explicit GameModule(MainWindow* mainWindow, const wxGLAttributes& displayAttributes);
     ~GameModule();
 
     void paintGL(wxPaintEvent& event);

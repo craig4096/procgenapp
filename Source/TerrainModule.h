@@ -51,7 +51,7 @@ class TerrainModule : public Viewport3D::Renderer, public Progress
     void exportTerrain();
 
 public:
-    explicit TerrainModule(MainWindow* mainWindow);
+    explicit TerrainModule(MainWindow* mainWindow, const wxGLAttributes& displayAttributes);
     ~TerrainModule();
 
     // terrain generatot progress interface

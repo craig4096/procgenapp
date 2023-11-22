@@ -15,8 +15,8 @@ EVT_MOUSEWHEEL(Viewport3D::wheelEvent)
 EVT_MOTION(Viewport3D::mouseMoveEvent)
 END_EVENT_TABLE()
 
-Viewport3D::Viewport3D(wxWindow* parent, Renderer* renderer, const std::string& skyboxDir, float zoomRate, float camMinDist, float camRotWeight)
-    : wxGLCanvas(parent, wxID_ANY)
+Viewport3D::Viewport3D(wxWindow* parent, const wxGLAttributes& displayAttributes, Renderer* renderer, const std::string& skyboxDir, float zoomRate, float camMinDist, float camRotWeight)
+    : wxGLCanvas(parent, displayAttributes, wxID_ANY)
     , renderer(renderer)
     , cameraRadius(200.0f)
     , prevXPos(0)
@@ -29,8 +29,16 @@ Viewport3D::Viewport3D(wxWindow* parent, Renderer* renderer, const std::string& 
     , camMinDist(camMinDist)
     , camRotWeight(camRotWeight)
     , draggingLeftMouse(false)
+    , glInitialised(false)
 {
-    context = new wxGLContext(this);
+}
+
+void Viewport3D::initialiseGL()
+{
+    wxGLContextAttrs contextAttributes;
+    contextAttributes.CoreProfile().EndList();
+
+    context = new wxGLContext(this, nullptr, &contextAttributes);
     SetCurrent(*context);
 
     glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
@@ -39,9 +47,12 @@ Viewport3D::Viewport3D(wxWindow* parent, Renderer* renderer, const std::string& 
     glCullFace(GL_BACK);
 
     // initiate glew lib
-    if (glewInit() != GLEW_OK)
+    const GLenum err = glewInit();
+    if (err != GLEW_OK)
     {
-        throw std::runtime_error("Could not initialize OpenGL");
+        // On some GPUs/drivers glewInit can fail but still load most of the OpenGL functions
+        // therefore we just display a warning instead of throwing an exception
+        std::cout << "Warning: glewInit failed with the following error code: " << err << std::endl;
     }
 
     if (renderer != nullptr)
@@ -84,6 +95,12 @@ void Viewport3D::resizeGL(wxSizeEvent& event)
 
 void Viewport3D::paintGL(wxPaintEvent& event)
 {
+    if (!glInitialised)
+    {
+        initialiseGL();
+        glInitialised = true;
+    }
+
     SetCurrent(*context);
     wxPaintDC(this);
 

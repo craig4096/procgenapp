@@ -7,14 +7,14 @@
 #include <glm/ext.hpp>
 using namespace std;
 
-ProcTexturingModule::ProcTexturingModule(MainWindow* mainWindow)
+ProcTexturingModule::ProcTexturingModule(MainWindow* mainWindow, const wxGLAttributes& displayAttributes)
     : mainWindow(mainWindow)
     , shaderInvalid(true)
     , shader(nullptr)
     , time(0.0f)
     , mesh(nullptr)
 {
-    viewport = new Viewport3D(mainWindow->proctex_viewport, this, "skybox", 0.01f, 5, 0.005f);
+    viewport = new Viewport3D(mainWindow->proctex_viewport, displayAttributes, this, "skybox", 0.01f, 5, 0.005f);
 
     mainWindow->proctex_viewport_sizer->Add(viewport, 1, wxEXPAND);
 

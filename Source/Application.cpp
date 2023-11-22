@@ -21,10 +21,14 @@ bool Application::OnInit()
     wxInitAllImageHandlers();
 
     mainWindow = new MainWindow(nullptr);
-    terrainModule = new TerrainModule(mainWindow);
-    bsgModule = new BSGModule(mainWindow);
-    proctexModule = new ProcTexturingModule(mainWindow);
-    gameModule = new GameModule(mainWindow);
+
+    wxGLAttributes displayAttributes;
+    displayAttributes.RGBA().DoubleBuffer().Depth(24).EndList();
+
+    terrainModule = new TerrainModule(mainWindow, displayAttributes);
+    bsgModule = new BSGModule(mainWindow, displayAttributes);
+    proctexModule = new ProcTexturingModule(mainWindow, displayAttributes);
+    gameModule = new GameModule(mainWindow, displayAttributes);
 
     const wxSize desktopSize = wxGetDisplaySize();
     const wxSize frameSize = wxSize(desktopSize.GetWidth() / 2, desktopSize.GetHeight() / 2);

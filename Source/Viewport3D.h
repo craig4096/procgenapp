@@ -17,6 +17,8 @@ public:
     };
 
 private:
+    void initialiseGL();
+
     Renderer*   renderer;
     float       cameraRadius;
     vec3        cameraPosition;
@@ -30,6 +32,7 @@ private:
     float       zoomRate;
     float       camMinDist;
     float       camRotWeight;
+    bool        glInitialised;
 
     glm::mat4 modelViewMatrix;
     glm::mat4 projectionMatrix;
@@ -38,7 +41,7 @@ private:
 
     wxGLContext* context;
 public:
-    explicit Viewport3D(wxWindow* parent, Renderer* renderer, const std::string& skyboxDir, float zoomRate, float camMinDist, float camRotWeight);
+    explicit Viewport3D(wxWindow* parent, const wxGLAttributes& displayAttributes, Renderer* renderer, const std::string& skyboxDir, float zoomRate, float camMinDist, float camRotWeight);
     ~Viewport3D();
 
     const glm::mat4& getModelViewMatrix() const { return modelViewMatrix; }

@@ -61,7 +61,7 @@ public:
 };
 
 
-TerrainModule::TerrainModule(MainWindow* mainWindow)
+TerrainModule::TerrainModule(MainWindow* mainWindow, const wxGLAttributes& displayAttributes)
     : mainWindow(mainWindow)
     , curSelected(-1)
     , activeHeightmap(nullptr)
@@ -80,7 +80,7 @@ TerrainModule::TerrainModule(MainWindow* mainWindow)
     mainWindow->terrain_oplist->Append("Inverse Thermal Erosion");
 
     // create the gl widget
-    viewport = new Viewport3D(mainWindow->terrain_viewport, this, "skybox", 0.2f, 10.0f, 0.01);
+    viewport = new Viewport3D(mainWindow->terrain_viewport, displayAttributes, this, "skybox", 0.2f, 10.0f, 0.01);
 
     mainWindow->terrain_viewport_sizer->Add(viewport, 1, wxEXPAND);
 

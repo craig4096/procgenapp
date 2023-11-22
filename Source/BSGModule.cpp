@@ -5,13 +5,13 @@
 #include <glm/ext.hpp>
 using namespace std;
 
-BSGModule::BSGModule(MainWindow* mainWindow)
+BSGModule::BSGModule(MainWindow* mainWindow, const wxGLAttributes& displayAttributes)
     : activeGrammar(nullptr)
     , numIterations(1)
     , mainWindow(mainWindow)
 {
     // create the gl widget
-    viewport = new Viewport3D(mainWindow->bsg_view_panel, this, "skybox", 0.01f, 10.0f, 0.01);
+    viewport = new Viewport3D(mainWindow->bsg_view_panel, displayAttributes, this, "skybox", 0.01f, 10.0f, 0.01);
 
     mainWindow->bsg_view_panel_sizer->Add(viewport, 1, wxEXPAND);
 
