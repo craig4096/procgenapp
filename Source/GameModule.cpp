@@ -13,7 +13,7 @@ EVT_LEAVE_WINDOW(GameModule::mouseExit)
 END_EVENT_TABLE()
 
 GameModule::GameModule(MainWindow* mainWindow, const wxGLAttributes& displayAttributes)
-    : wxGLCanvas(mainWindow->game_viewport, wxID_ANY)
+    : wxGLCanvas(mainWindow->game_viewport, displayAttributes, wxID_ANY)
     , mainWindow(mainWindow)
     , updateTimer(this)
     , glInitialised(false)
